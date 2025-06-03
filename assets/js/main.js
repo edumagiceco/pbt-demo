@@ -227,7 +227,7 @@ const PageSpecific = {
         loadStats: async function() {
             try {
                 PBTUtils.showLoading('#stats-container');
-                const stats = await PBTUtils.ajax('/api/dashboard/stats.php');
+                const stats = await PBTUtils.ajax('/api/dashboard/stats');
                 this.renderStats(stats);
                 PBTUtils.hideLoading();
             } catch (error) {
@@ -242,7 +242,7 @@ const PageSpecific = {
         
         loadRecentProjects: async function() {
             try {
-                const projects = await PBTUtils.ajax('/api/projects/recent.php');
+                const projects = await PBTUtils.ajax('/api/projects/recent');
                 this.renderRecentProjects(projects);
             } catch (error) {
                 PBTUtils.showError('최근 프로젝트를 불러오는데 실패했습니다.');
@@ -284,7 +284,7 @@ const PageSpecific = {
             try {
                 PBTUtils.showLoading('#project-list');
                 const formData = PBTUtils.formToObject(document.getElementById('search-form'));
-                const projects = await PBTUtils.ajax('/api/projects/list.php', {
+                const projects = await PBTUtils.ajax('/api/projects/list', {
                     method: 'POST',
                     data: formData
                 });
