@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토론 상세 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 0.5rem;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .discussion-main {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .discussion-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+        
+        .discussion-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        .discussion-meta {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            color: #718096;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .discussion-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .discussion-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .status-solved {
+            background: rgba(72, 187, 120, 0.1);
+            color: #48bb78;
+        }
+        
+        .status-active {
+            background: rgba(237, 137, 54, 0.1);
+            color: #ed8936;
+        }
+        
+        .status-new {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .discussion-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            white-space: pre-wrap;
+        }
+        
+        .discussion-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 2px solid #f7fafc;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn.like {
+            background: rgba(72, 187, 120, 0.1);
+            color: #48bb78;
+        }
+        
+        .action-btn.like:hover {
+            background: rgba(72, 187, 120, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.reply {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .action-btn.reply:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.edit {
+            background: rgba(237, 137, 54, 0.1);
+            color: #ed8936;
+        }
+        
+        .action-btn.edit:hover {
+            background: rgba(237, 137, 54, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .comments-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+        
+        .comments-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .comment-form {
+            margin-bottom: 2rem;
+        }
+        
+        .comment-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        .comment-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .comment-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .comment-item {
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .comment-time {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .comment-content {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .comment-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .comment-action {
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: color 0.3s ease;
+        }
+        
+        .comment-action:hover {
+            color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-comments {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .discussion-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .discussion-actions {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .comment-form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/progress.html" class="nav-link">학습 진도</a>
+            <a href="/discussions.html" class="nav-link" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/discussions.html">← 토론 게시판</a>
+            <span>/ 토론 상세</span>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>토론 내용을 불러오는 중...</p>
+        </div>
+        
+        <div id="discussion-content" style="display: none;">
+            <div class="discussion-main">
+                <div class="discussion-header">
+                    <h1 id="discussion-title" class="discussion-title"></h1>
+                    <div class="discussion-meta">
+                        <div class="meta-item">
+                            <span>👤</span>
+                            <span id="discussion-author"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span id="discussion-date"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📂</span>
+                            <span id="discussion-category"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>👁️</span>
+                            <span id="discussion-views"></span>
+                        </div>
+                    </div>
+                    <div id="discussion-tags" class="discussion-tags"></div>
+                    <div id="discussion-status" class="discussion-status"></div>
+                </div>
+                
+                <div id="discussion-content-text" class="discussion-content"></div>
+                
+                <div class="discussion-actions">
+                    <button class="action-btn like" onclick="toggleLike()">
+                        <span id="like-icon">👍</span>
+                        <span id="like-count">0</span>
+                    </button>
+                    <button class="action-btn reply" onclick="scrollToCommentForm()">
+                        <span>💬</span>
+                        <span>댓글 작성</span>
+                    </button>
+                    <button id="edit-btn" class="action-btn edit" onclick="editDiscussion()" style="display: none;">
+                        <span>✏️</span>
+                        <span>수정</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="comments-section">
+                <div class="comments-header">
+                    <h2 class="comments-title">💬 댓글 <span id="comment-count">0</span>개</h2>
+                </div>
+                
+                <div class="comment-form">
+                    <textarea id="comment-textarea" class="comment-textarea" placeholder="댓글을 작성해주세요..."></textarea>
+                    <div class="comment-form-actions">
+                        <button class="btn btn-secondary" onclick="clearCommentForm()">취소</button>
+                        <button class="btn btn-primary" onclick="submitComment()">댓글 작성</button>
+                    </div>
+                </div>
+                
+                <div id="comment-list" class="comment-list">
+                    <!-- 댓글 목록이 여기에 동적으로 추가됩니다 -->
+                </div>
+                
+                <div id="empty-comments" class="empty-comments" style="display: none;">
+                    <h3>💭 아직 댓글이 없습니다</h3>
+                    <p>첫 번째 댓글을 작성해보세요!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDiscussion = null;
+        let currentUser = null;
+        let discussionComments = [];
+        
+        // 페이지 로드 시 토론 상세 내용 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            const userInfo = localStorage.getItem('userInfo');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            if (userInfo) {
+                currentUser = JSON.parse(userInfo);
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const discussionId = urlParams.get('id');
+            
+            if (!discussionId) {
+                alert('토론 ID가 없습니다.');
+                window.location.href = '/discussions.html';
+                return;
+            }
+            
+            await loadDiscussion(discussionId);
+            await loadComments(discussionId);
+        });
+        
+        // 토론 상세 내용 로드
+        async function loadDiscussion(discussionId) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('discussion-content');
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                // 실제 API 호출을 시뮬레이션하고 샘플 데이터 사용
+                await new Promise(resolve => setTimeout(resolve, 500)); // 로딩 시뮬레이션
+                
+                // 샘플 토론 데이터
+                const sampleDiscussions = {
+                    '1': {
+                        id: 1,
+                        title: 'JavaScript 클로저에 대한 질문',
+                        content: `클로저(Closure)는 JavaScript의 중요한 개념 중 하나인데, 아직 완전히 이해하지 못하겠습니다.
+
+특히 다음과 같은 코드에서 클로저가 어떻게 작동하는지 궁금합니다:
+
+function outerFunction(x) {
+    return function(y) {
+        return x + y;
+    };
+}
+
+const addFive = outerFunction(5);
+console.log(addFive(10)); // 15
+
+1. 내부 함수가 어떻게 외부 함수의 변수에 접근할 수 있는가?
+2. 실제 개발에서 클로저를 어떻게 활용하나?
+3. 클로저와 관련된 메모리 누수 문제는 없는가?
+
+경험 있으신 분들의 조언 부탁드립니다!`,
+                        category: 'question',
+                        author: '이학생',
+                        authorId: 'student1',
+                        createdAt: '2025-05-24T10:30:00Z',
+                        status: 'active',
+                        isPinned: false,
+                        viewCount: 26, // 조회수 증가
+                        likeCount: 5,
+                        tags: ['javascript', '클로저', '기초']
+                    },
+                    '2': {
+                        id: 2,
+                        title: '[공지] 알고리즘 스터디 그룹 모집',
+                        content: `안녕하세요! 김강사입니다.
+
+매주 화요일 저녁 7시에 알고리즘 문제를 함께 풀 스터디 그룹을 모집합니다.
+
+📅 일정: 매주 화요일 19:00 ~ 21:00
+📍 장소: 온라인 (Zoom)
+👥 인원: 최대 8명
+📚 내용: 백준, 프로그래머스 문제 풀이 및 토론
+
+참여하고 싶으신 분은 댓글로 신청해주세요!
+
+#알고리즘 #스터디 #모집`,
+                        category: 'announcement',
+                        author: '김강사',
+                        authorId: 'instructor1',
+                        createdAt: '2025-05-23T14:00:00Z',
+                        status: 'new',
+                        isPinned: true,
+                        viewCount: 103,
+                        likeCount: 28,
+                        tags: ['알고리즘', '스터디', '모집']
+                    }
+                };
+                
+                // localStorage에서 사용자가 작성한 토론도 불러오기
+                const savedDiscussions = localStorage.getItem('userDiscussions');
+                if (savedDiscussions) {
+                    const userDiscussions = JSON.parse(savedDiscussions);
+                    Object.assign(sampleDiscussions, userDiscussions);
+                }
+                
+                currentDiscussion = sampleDiscussions[discussionId] || sampleDiscussions['1'];
+                
+                // 조회수 증가
+                currentDiscussion.viewCount++;
+                
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                
+                renderDiscussion(currentDiscussion);
+                
+            } catch (error) {
+                console.error('토론 로드 오류:', error);
+                loading.style.display = 'none';
+                alert('토론을 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 토론 내용 렌더링
+        function renderDiscussion(discussion) {
+            document.getElementById('discussion-title').textContent = discussion.title;
+            document.getElementById('discussion-author').textContent = discussion.author;
+            document.getElementById('discussion-date').textContent = formatDate(new Date(discussion.createdAt));
+            document.getElementById('discussion-category').textContent = getCategoryText(discussion.category);
+            document.getElementById('discussion-views').textContent = discussion.viewCount;
+            document.getElementById('discussion-content-text').textContent = discussion.content;
+            document.getElementById('like-count').textContent = discussion.likeCount;
+            
+            // 태그 렌더링
+            const tagsContainer = document.getElementById('discussion-tags');
+            tagsContainer.innerHTML = discussion.tags.map(tag => 
+                `<span class="tag">#${tag}</span>`
+            ).join('');
+            
+            // 상태 렌더링
+            const statusContainer = document.getElementById('discussion-status');
+            const statusIcon = {
+                'solved': '✅',
+                'active': '🔄',
+                'new': '🆕'
+            }[discussion.status] || '🔄';
+            
+            const statusText = {
+                'solved': '해결됨',
+                'active': '활성',
+                'new': '새글'
+            }[discussion.status] || '활성';
+            
+            statusContainer.innerHTML = `${statusIcon} ${statusText}`;
+            statusContainer.className = `discussion-status status-${discussion.status}`;
+            
+            // 편집 버튼 표시 (작성자만)
+            if (currentUser && currentUser.username === discussion.authorId) {
+                document.getElementById('edit-btn').style.display = 'flex';
+            }
+        }
+        
+        // 댓글 목록 로드
+        async function loadComments(discussionId) {
+            try {
+                // 샘플 댓글 데이터
+                const sampleComments = {
+                    '1': [
+                        {
+                            id: 1,
+                            author: '박개발',
+                            content: `클로저는 정말 유용한 개념입니다! 간단히 설명하자면:
+
+1. 내부 함수가 외부 함수의 스코프에 접근할 수 있는 것
+2. 외부 함수가 종료되어도 내부 함수가 외부 변수를 "기억"하는 것
+
+실제 활용 예시:
+- 데이터 프라이버시 (private 변수)
+- 함수 팩토리
+- 콜백 함수에서 상태 유지`,
+                            createdAt: '2025-05-24T11:15:00Z',
+                            likeCount: 3
+                        },
+                        {
+                            id: 2,
+                            author: '최알고',
+                            content: '메모리 누수 관련해서는 주의가 필요합니다. 클로저가 참조하는 변수들은 가비지 컬렉션되지 않기 때문에, 불필요한 참조는 제거해주는 것이 좋습니다.',
+                            createdAt: '2025-05-24T12:30:00Z',
+                            likeCount: 2
+                        },
+                        {
+                            id: 3,
+                            author: '정자바',
+                            content: 'MDN 문서의 클로저 섹션을 참고하시면 더 자세한 설명을 볼 수 있습니다. 실습 예제도 많이 있어요!',
+                            createdAt: '2025-05-24T14:45:00Z',
+                            likeCount: 1
+                        }
+                    ],
+                    '2': [
+                        {
+                            id: 4,
+                            author: '이학생',
+                            content: '스터디 참여하고 싶습니다! 어떤 난이도의 문제를 다루나요?',
+                            createdAt: '2025-05-23T15:30:00Z',
+                            likeCount: 0
+                        },
+                        {
+                            id: 5,
+                            author: '김코더',
+                            content: '저도 참여 희망합니다. 초급자도 괜찮을까요?',
+                            createdAt: '2025-05-23T16:15:00Z',
+                            likeCount: 1
+                        }
+                    ]
+                };
+                
+                discussionComments = sampleComments[discussionId] || [];
+                renderComments(discussionComments);
+                
+            } catch (error) {
+                console.error('댓글 로드 오류:', error);
+            }
+        }
+        
+        // 댓글 렌더링
+        function renderComments(comments) {
+            const commentList = document.getElementById('comment-list');
+            const emptyComments = document.getElementById('empty-comments');
+            const commentCount = document.getElementById('comment-count');
+            
+            commentCount.textContent = comments.length;
+            
+            if (comments.length === 0) {
+                commentList.style.display = 'none';
+                emptyComments.style.display = 'block';
+                return;
+            }
+            
+            commentList.style.display = 'block';
+            emptyComments.style.display = 'none';
+            
+            commentList.innerHTML = comments.map(comment => `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">${comment.author}</span>
+                        <span class="comment-time">${formatDate(new Date(comment.createdAt))}</span>
+                    </div>
+                    <div class="comment-content">${comment.content}</div>
+                    <div class="comment-actions">
+                        <button class="comment-action" onclick="likeComment(${comment.id})">
+                            👍 ${comment.likeCount}
+                        </button>
+                        <button class="comment-action" onclick="replyToComment(${comment.id})">
+                            💬 답글
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 날짜 포맷팅
+        function formatDate(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) {
+                return `${diffDays}일 전`;
+            } else if (diffHours > 0) {
+                return `${diffHours}시간 전`;
+            } else {
+                return '방금 전';
+            }
+        }
+        
+        // 카테고리 텍스트 변환
+        function getCategoryText(category) {
+            const categoryMap = {
+                'question': '질문',
+                'discussion': '토론',
+                'announcement': '공지',
+                'tip': '팁 공유'
+            };
+            return categoryMap[category] || '기타';
+        }
+        
+        // 좋아요 토글
+        function toggleLike() {
+            if (!currentDiscussion) return;
+            
+            // 좋아요 상태 토글 (실제로는 서버에 요청)
+            currentDiscussion.likeCount += 1;
+            document.getElementById('like-count').textContent = currentDiscussion.likeCount;
+            
+            // 아이콘 변경
+            const likeIcon = document.getElementById('like-icon');
+            likeIcon.textContent = '💙';
+            setTimeout(() => {
+                likeIcon.textContent = '👍';
+            }, 1000);
+        }
+        
+        // 댓글 작성 폼으로 스크롤
+        function scrollToCommentForm() {
+            document.querySelector('.comment-form').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+            document.getElementById('comment-textarea').focus();
+        }
+        
+        // 댓글 작성
+        async function submitComment() {
+            const textarea = document.getElementById('comment-textarea');
+            const content = textarea.value.trim();
+            
+            if (!content) {
+                alert('댓글 내용을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                // 실제로는 서버에 POST 요청
+                const newComment = {
+                    id: discussionComments.length + 1,
+                    author: currentUser?.username || '익명',
+                    content: content,
+                    createdAt: new Date().toISOString(),
+                    likeCount: 0
+                };
+                
+                discussionComments.push(newComment);
+                renderComments(discussionComments);
+                clearCommentForm();
+                
+                alert('댓글이 작성되었습니다!');
+                
+            } catch (error) {
+                console.error('댓글 작성 오류:', error);
+                alert('댓글 작성 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 댓글 폼 초기화
+        function clearCommentForm() {
+            document.getElementById('comment-textarea').value = '';
+        }
+        
+        // 댓글 좋아요
+        function likeComment(commentId) {
+            console.log('댓글 좋아요:', commentId);
+            // 실제로는 서버에 요청
+        }
+        
+        // 댓글에 답글
+        function replyToComment(commentId) {
+            console.log('댓글 답글:', commentId);
+            scrollToCommentForm();
+        }
+        
+        // 토론 수정
+        function editDiscussion() {
+            alert('토론 수정 기능은 추후 구현될 예정입니다.');
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

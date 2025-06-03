@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .assignment-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .assignment-title {
+            font-size: 2rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+        
+        .assignment-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+        }
+        
+        .assignment-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .status-pending {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .status-submitted {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+        
+        .status-graded {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .assignment-description {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .file-upload-icon {
+            font-size: 3rem;
+            color: #cbd5e0;
+            margin-bottom: 1rem;
+        }
+        
+        .file-list {
+            margin-bottom: 1rem;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-icon {
+            font-size: 1.2rem;
+        }
+        
+        .remove-file {
+            color: #e53e3e;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        
+        .remove-file:hover {
+            background: #fed7d7;
+        }
+        
+        .text-submission {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .submission-history {
+            margin-top: 1rem;
+        }
+        
+        .submission-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .submission-meta {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2f855a;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .feedback-box {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .assignment-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/courses.html">내 과정</a> > 
+            <a href="#" id="course-link">JavaScript 기초 프로그래밍</a> > 
+            <span id="assignment-breadcrumb">과제</span>
+        </div>
+        
+        <div class="assignment-header">
+            <h1 class="assignment-title" id="assignment-title">과제 제목</h1>
+            <div class="assignment-meta">
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>마감일: <span id="due-date">2025-06-01 23:59</span></span>
+                </div>
+                <div class="meta-item">
+                    <span>📊</span>
+                    <span>배점: <span id="max-score">100</span>점</span>
+                </div>
+                <div class="meta-item">
+                    <span>📝</span>
+                    <span>유형: <span id="assignment-type">파일 제출</span></span>
+                </div>
+                <div class="meta-item">
+                    <span>🔄</span>
+                    <span>제출 횟수: <span id="submission-count">1/3</span></span>
+                </div>
+            </div>
+            <div class="assignment-status" id="assignment-status">미제출</div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="main-content">
+                <!-- 과제 설명 -->
+                <div class="section">
+                    <h2 class="section-title">📋 과제 설명</h2>
+                    <div class="assignment-description" id="assignment-description">
+                        JavaScript 함수와 스코프에 대한 실습 과제입니다. 
+                        주어진 요구사항에 따라 JavaScript 함수를 작성하고 결과를 제출해주세요.
+                    </div>
+                </div>
+                
+                <!-- 제출 영역 -->
+                <div class="section" id="submission-section">
+                    <h2 class="section-title">📤 과제 제출</h2>
+                    
+                    <!-- 파일 제출 -->
+                    <div id="file-submission" style="display: block;">
+                        <div class="file-upload-area" onclick="document.getElementById('file-input').click()">
+                            <div class="file-upload-icon">📁</div>
+                            <p>파일을 클릭하거나 드래그하여 업로드하세요</p>
+                            <small>지원 형식: .js, .html, .css, .zip (최대 10MB)</small>
+                        </div>
+                        <input type="file" id="file-input" style="display: none;" multiple accept=".js,.html,.css,.zip,.txt,.pdf">
+                        
+                        <div class="file-list" id="file-list"></div>
+                    </div>
+                    
+                    <!-- 텍스트 제출 -->
+                    <div id="text-submission" style="display: none;">
+                        <textarea class="text-submission" id="submission-text" placeholder="과제 내용을 입력하세요..."></textarea>
+                    </div>
+                    
+                    <div class="loading" id="upload-loading">
+                        <div class="spinner"></div>
+                        <p>제출 중...</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="submitAssignment()" id="submit-btn">
+                            📤 과제 제출
+                        </button>
+                        <button class="btn btn-secondary" onclick="saveDraft()" id="save-btn">
+                            💾 임시 저장
+                        </button>
+                        <button class="btn btn-danger" onclick="clearSubmission()" id="clear-btn">
+                            🗑️ 초기화
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 제출 내역 -->
+                <div class="section">
+                    <h2 class="section-title">📄 제출 내역</h2>
+                    <div id="submission-history">
+                        <!-- 제출 내역이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 사이드바 -->
+            <div class="sidebar">
+                <!-- 점수 및 피드백 -->
+                <div class="section" id="grade-section" style="display: none;">
+                    <h3 class="section-title">🎯 점수</h3>
+                    <div class="score-display" id="final-score">85/100</div>
+                    <div class="feedback-box">
+                        <h4>강사 피드백</h4>
+                        <div id="instructor-feedback">
+                            전반적으로 잘 작성되었습니다. 다만 예외 처리 부분을 더 보완하면 좋겠습니다.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 과제 요구사항 -->
+                <div class="section">
+                    <h3 class="section-title">📌 요구사항</h3>
+                    <ul id="requirements-list">
+                        <li>함수 선언과 표현식의 차이점 구현</li>
+                        <li>클로저를 활용한 카운터 함수 작성</li>
+                        <li>스코프 체인 이해를 보여주는 예제</li>
+                        <li>적절한 주석과 설명 포함</li>
+                    </ul>
+                </div>
+                
+                <!-- 참고 자료 -->
+                <div class="section">
+                    <h3 class="section-title">📚 참고 자료</h3>
+                    <div id="reference-materials">
+                        <a href="#" class="btn btn-secondary" style="display: block; margin-bottom: 0.5rem;">
+                            📄 함수 참고 문서
+                        </a>
+                        <a href="#" class="btn btn-secondary" style="display: block; margin-bottom: 0.5rem;">
+                            🎥 스코프 설명 영상
+                        </a>
+                        <a href="#" class="btn btn-secondary" style="display: block;">
+                            💻 예제 코드 템플릿
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL에서 과정 ID와 과제 ID 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseId');
+        const assignmentId = urlParams.get('assignmentId');
+        
+        let selectedFiles = [];
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!courseId || !assignmentId) {
+                alert('잘못된 접근입니다.');
+                history.back();
+                return;
+            }
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            await loadAssignmentDetail(courseId, assignmentId);
+            setupFileUpload();
+        });
+        
+        // 과제 상세 정보 로드
+        async function loadAssignmentDetail(courseId, assignmentId) {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                // 실제 API 호출
+                const response = await fetch(`/api/assignments/${assignmentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const assignment = result.data;
+                    
+                    if (!assignment) {
+                        throw new Error('과제 데이터가 없습니다');
+                    }
+                    
+                    // 과제 정보 표시
+                    document.getElementById('assignment-title').textContent = assignment.title;
+                    document.getElementById('assignment-breadcrumb').textContent = assignment.title;
+                    document.getElementById('due-date').textContent = new Date(assignment.dueDate).toLocaleString('ko-KR');
+                    document.getElementById('max-score').textContent = assignment.maxScore;
+                    document.getElementById('assignment-type').textContent = getTypeText(assignment.type);
+                    document.getElementById('assignment-description').textContent = assignment.description;
+                    document.getElementById('course-link').href = `/course-detail.html?id=${courseId}`;
+                    
+                    // 제출 횟수 계산
+                    const submissionCount = assignment.userSubmissions ? assignment.userSubmissions.length : 0;
+                    const maxSubmissions = assignment.maxSubmissions || 1;
+                    document.getElementById('submission-count').textContent = `${submissionCount}/${maxSubmissions}`;
+                    
+                    // 상태 및 점수 표시
+                    let status = 'pending';
+                    let score = null;
+                    if (assignment.userSubmissions && assignment.userSubmissions.length > 0) {
+                        const latestSubmission = assignment.userSubmissions[0];
+                        status = latestSubmission.status;
+                        score = latestSubmission.score;
+                    }
+                    
+                    const statusElement = document.getElementById('assignment-status');
+                    const statusText = getStatusText(status);
+                    statusElement.textContent = statusText;
+                    statusElement.className = `assignment-status status-${status}`;
+                    
+                    // 점수 및 피드백 표시
+                    if (score !== null) {
+                        document.getElementById('grade-section').style.display = 'block';
+                        document.getElementById('final-score').textContent = `${score}/${assignment.maxScore}`;
+                        if (assignment.userSubmissions[0].feedback) {
+                            document.getElementById('instructor-feedback').textContent = assignment.userSubmissions[0].feedback;
+                        }
+                    }
+                    
+                    // 제출 타입에 따른 UI 설정
+                    if (assignment.type === 'quiz') {
+                        document.getElementById('submission-section').style.display = 'none';
+                    } else if (assignment.type === 'text') {
+                        document.getElementById('file-submission').style.display = 'none';
+                        document.getElementById('text-submission').style.display = 'block';
+                    }
+                    
+                    // 제출 완료된 경우 제출 버튼 비활성화
+                    if (status === 'completed' || status === 'graded' || submissionCount >= maxSubmissions) {
+                        document.getElementById('submit-btn').disabled = true;
+                        document.getElementById('submit-btn').textContent = '제출 완료';
+                    }
+                    
+                    // 제출 내역 로드
+                    loadSubmissionHistory(assignment);
+                    
+                } else {
+                    throw new Error('API 호출 실패');
+                }
+                
+            } catch (error) {
+                console.error('과제 로드 오류:', error);
+                
+                // 오류 시 샘플 데이터 사용
+                const assignments = {
+                    '1': {
+                        id: 1,
+                        title: '기본 문법 퀴즈',
+                        description: '변수, 연산자, 조건문에 대한 기본 퀴즈입니다.',
+                        type: 'quiz',
+                        maxScore: 50,
+                        dueDate: '2025-05-30 23:59',
+                        status: 'completed',
+                        score: 85,
+                        feedback: '문법 이해도가 우수합니다.',
+                        submissionCount: '1/1'
+                    },
+                    '2': {
+                        id: 2,
+                        title: '함수 실습 과제',
+                        description: 'JavaScript 함수와 스코프에 대한 실습 과제입니다. 주어진 요구사항에 따라 JavaScript 함수를 작성하고 결과를 제출해주세요.',
+                        type: 'file',
+                        maxScore: 100,
+                        dueDate: '2025-06-01 23:59',
+                        status: 'submitted',
+                        score: null,
+                        feedback: null,
+                        submissionCount: '1/3'
+                    },
+                    '3': {
+                        id: 3,
+                        title: '프로젝트 과제',
+                        description: '간단한 웹 애플리케이션을 제작하는 프로젝트 과제입니다.',
+                        type: 'project',
+                        maxScore: 150,
+                        dueDate: '2025-06-15 23:59',
+                        status: 'pending',
+                        score: null,
+                        feedback: null,
+                        submissionCount: '0/2'
+                    }
+                };
+                
+                const assignment = assignments[assignmentId];
+                if (!assignment) {
+                    alert('존재하지 않는 과제입니다.');
+                    history.back();
+                    return;
+                }
+                
+                // 샘플 데이터로 표시
+                document.getElementById('assignment-title').textContent = assignment.title;
+                document.getElementById('assignment-breadcrumb').textContent = assignment.title;
+                document.getElementById('due-date').textContent = assignment.dueDate;
+                document.getElementById('max-score').textContent = assignment.maxScore;
+                document.getElementById('assignment-type').textContent = getTypeText(assignment.type);
+                document.getElementById('submission-count').textContent = assignment.submissionCount;
+                document.getElementById('assignment-description').textContent = assignment.description;
+                document.getElementById('course-link').href = `/course-detail.html?id=${courseId}`;
+                
+                // 상태 표시
+                const statusElement = document.getElementById('assignment-status');
+                const statusText = getStatusText(assignment.status);
+                statusElement.textContent = statusText;
+                statusElement.className = `assignment-status status-${assignment.status}`;
+                
+                // 점수 및 피드백 표시
+                if (assignment.score !== null) {
+                    document.getElementById('grade-section').style.display = 'block';
+                    document.getElementById('final-score').textContent = `${assignment.score}/${assignment.maxScore}`;
+                    if (assignment.feedback) {
+                        document.getElementById('instructor-feedback').textContent = assignment.feedback;
+                    }
+                }
+                
+                // 제출 타입에 따른 UI 설정
+                if (assignment.type === 'quiz') {
+                    document.getElementById('submission-section').style.display = 'none';
+                } else if (assignment.type === 'text') {
+                    document.getElementById('file-submission').style.display = 'none';
+                    document.getElementById('text-submission').style.display = 'block';
+                }
+                
+                // 제출 완료된 경우 제출 버튼 비활성화
+                if (assignment.status === 'completed' || assignment.status === 'graded') {
+                    document.getElementById('submit-btn').disabled = true;
+                    document.getElementById('submit-btn').textContent = '제출 완료';
+                }
+                
+                // 제출 내역 로드
+                loadSubmissionHistory(assignment);
+            }
+        }
+        
+        // 파일 업로드 설정
+        function setupFileUpload() {
+            const fileInput = document.getElementById('file-input');
+            const uploadArea = document.querySelector('.file-upload-area');
+            
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // 드래그 앤 드롭
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFileSelect({ target: { files: e.dataTransfer.files } });
+            });
+        }
+        
+        // 파일 선택 처리
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (validateFile(file)) {
+                    selectedFiles.push(file);
+                }
+            });
+            
+            updateFileList();
+        }
+        
+        // 파일 검증
+        function validateFile(file) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['.js', '.html', '.css', '.zip', '.txt', '.pdf'];
+            
+            if (file.size > maxSize) {
+                alert(`파일 크기가 너무 큽니다: ${file.name} (최대 10MB)`);
+                return false;
+            }
+            
+            const extension = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(extension)) {
+                alert(`지원하지 않는 파일 형식입니다: ${file.name}`);
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // 파일 목록 업데이트
+        function updateFileList() {
+            const fileList = document.getElementById('file-list');
+            
+            if (selectedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+            
+            fileList.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <span>${file.name}</span>
+                        <small>(${formatFileSize(file.size)})</small>
+                    </div>
+                    <span class="remove-file" onclick="removeFile(${index})">❌</span>
+                </div>
+            `).join('');
+        }
+        
+        // 파일 제거
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
+        
+        // 파일 크기 포맷
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 과제 제출
+        async function submitAssignment() {
+            const submitBtn = document.getElementById('submit-btn');
+            const loading = document.getElementById('upload-loading');
+            
+            if (selectedFiles.length === 0 && !document.getElementById('submission-text').value.trim()) {
+                alert('제출할 내용이 없습니다.');
+                return;
+            }
+            
+            if (!confirm('과제를 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.')) {
+                return;
+            }
+            
+            try {
+                submitBtn.disabled = true;
+                loading.style.display = 'block';
+                
+                // 실제 API 호출 시뮬레이션
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                alert('과제가 성공적으로 제출되었습니다!');
+                
+                // 상태 업데이트
+                const statusElement = document.getElementById('assignment-status');
+                statusElement.textContent = '제출 완료';
+                statusElement.className = 'assignment-status status-submitted';
+                
+                submitBtn.textContent = '제출 완료';
+                
+                // 제출 내역 추가
+                addSubmissionToHistory();
+                
+            } catch (error) {
+                console.error('제출 오류:', error);
+                alert('제출 중 오류가 발생했습니다.');
+                submitBtn.disabled = false;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        // 임시 저장
+        function saveDraft() {
+            alert('임시 저장되었습니다.');
+        }
+        
+        // 제출 내용 초기화
+        function clearSubmission() {
+            if (confirm('모든 내용을 초기화하시겠습니까?')) {
+                selectedFiles = [];
+                updateFileList();
+                document.getElementById('submission-text').value = '';
+            }
+        }
+        
+        // 제출 내역 로드
+        function loadSubmissionHistory(assignment) {
+            const historyContainer = document.getElementById('submission-history');
+            
+            if (assignment.status === 'pending') {
+                historyContainer.innerHTML = '<p style="text-align: center; color: #718096;">아직 제출 내역이 없습니다.</p>';
+                return;
+            }
+            
+            const submissions = [
+                {
+                    id: 1,
+                    submittedAt: '2025-05-25 14:30:00',
+                    files: ['functions.js', 'scope-example.html'],
+                    status: assignment.status,
+                    score: assignment.score,
+                    feedback: assignment.feedback
+                }
+            ];
+            
+            historyContainer.innerHTML = submissions.map(submission => `
+                <div class="submission-item">
+                    <div class="submission-header">
+                        <strong>제출 #${submission.id}</strong>
+                        <span class="status-${submission.status}">${getStatusText(submission.status)}</span>
+                    </div>
+                    <div class="submission-meta">
+                        제출일: ${submission.submittedAt}<br>
+                        파일: ${submission.files.join(', ')}
+                        ${submission.score !== null ? `<br>점수: ${submission.score}점` : ''}
+                    </div>
+                    ${submission.feedback ? `
+                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #f7fafc; border-radius: 4px;">
+                            <strong>피드백:</strong> ${submission.feedback}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // 제출 내역에 새 제출 추가
+        function addSubmissionToHistory() {
+            const historyContainer = document.getElementById('submission-history');
+            const now = new Date().toLocaleString('ko-KR');
+            const fileNames = selectedFiles.map(f => f.name);
+            
+            const newSubmission = `
+                <div class="submission-item">
+                    <div class="submission-header">
+                        <strong>제출 #2</strong>
+                        <span class="status-submitted">제출 완료</span>
+                    </div>
+                    <div class="submission-meta">
+                        제출일: ${now}<br>
+                        파일: ${fileNames.join(', ') || '텍스트 제출'}
+                    </div>
+                </div>
+            `;
+            
+            historyContainer.innerHTML = newSubmission + historyContainer.innerHTML;
+        }
+        
+        // 유틸리티 함수들
+        function getTypeText(type) {
+            const types = {
+                'file': '파일 제출',
+                'text': '텍스트 제출',
+                'quiz': '퀴즈',
+                'project': '프로젝트'
+            };
+            return types[type] || type;
+        }
+        
+        function getStatusText(status) {
+            const statuses = {
+                'pending': '미제출',
+                'submitted': '제출 완료',
+                'graded': '채점 완료',
+                'completed': '완료'
+            };
+            return statuses[status] || status;
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

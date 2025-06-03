@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>만다라트 편집기 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .editor-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .editor-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .editor-title h1 {
+            color: #4a5568;
+            font-size: 1.8rem;
+        }
+        
+        .editor-title input {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4a5568;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+            min-width: 300px;
+        }
+        
+        .editor-title input:focus {
+            outline: none;
+            border-bottom-color: #667eea;
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .mandart-workspace {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+        }
+        
+        .mandart-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 2px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .mandart-cell {
+            background: white;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 0.5rem;
+            position: relative;
+            min-height: 80px;
+        }
+        
+        .mandart-cell:hover {
+            background: #f7fafc;
+            transform: scale(1.02);
+        }
+        
+        .mandart-cell.center {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .mandart-cell.goal {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .mandart-cell.task {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .mandart-cell.has-content {
+            border-color: #667eea;
+        }
+        
+        .cell-content {
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .cell-position {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.6rem;
+            color: #718096;
+            font-weight: bold;
+        }
+        
+        .mandart-cell.center .cell-position {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .mandart-cell.goal .cell-position {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            right: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            height: 80vh;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar.active {
+            right: 20px;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .sidebar-header h3 {
+            color: #4a5568;
+            font-size: 1.2rem;
+        }
+        
+        .close-sidebar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .color-option.selected {
+            border-color: #4a5568;
+            transform: scale(1.1);
+        }
+        
+        .progress-info {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+        }
+        
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        @media (max-width: 1024px) {
+            .mandart-grid {
+                max-width: 100%;
+                gap: 1px;
+            }
+            
+            .mandart-cell {
+                min-height: 60px;
+                padding: 0.3rem;
+            }
+            
+            .cell-content {
+                font-size: 0.7rem;
+                -webkit-line-clamp: 2;
+            }
+            
+            .sidebar {
+                width: 100%;
+                right: -100%;
+                left: 0;
+                top: 0;
+                transform: none;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .sidebar.active {
+                right: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .editor-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .editor-title input {
+                min-width: 250px;
+            }
+            
+            .mandart-cell {
+                min-height: 50px;
+                padding: 0.2rem;
+            }
+            
+            .cell-content {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html">대시보드</a>
+            <a href="/mandarts.html">만다라트</a>
+        </div>
+        <div class="user-info">
+            <span id="userName">사용자님</span>
+            <button class="logout-btn btn btn-secondary" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="editor-header">
+            <div class="editor-title">
+                <span style="color: #4a5568; font-size: 1.8rem;">🎯</span>
+                <input type="text" id="mandartTitle" placeholder="만다라트 제목을 입력하세요" value="새로운 만다라트">
+            </div>
+            <div class="editor-actions">
+                <button class="btn btn-secondary" onclick="showSettings()">
+                    ⚙️ 설정
+                </button>
+                <button class="btn btn-primary" onclick="saveMandart()">
+                    💾 저장
+                </button>
+                <button class="btn btn-success" onclick="saveMandart(true)">
+                    ✨ 저장 후 활성화
+                </button>
+                <a href="/mandarts.html" class="btn btn-secondary">
+                    📋 목록으로
+                </a>
+            </div>
+        </div>
+        
+        <div class="mandart-workspace">
+            <div class="mandart-grid" id="mandartGrid">
+                <!-- 9x9 그리드가 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 사이드바 -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3 id="sidebarTitle">만다라트 설정</h3>
+            <button class="close-sidebar" onclick="closeSidebar()">×</button>
+        </div>
+        
+        <div id="sidebarContent">
+            <!-- 사이드바 내용이 동적으로 변경됩니다 -->
+        </div>
+    </div>
+
+    <script>
+        let currentMandart = {
+            id: null,
+            title: '새로운 만다라트',
+            description: '',
+            centerGoal: '',
+            goals: {},
+            tasks: {},
+            status: 'draft'
+        };
+        
+        let gridData = {};
+        const gridSize = 9;
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await initializeEditor();
+            createMandartGrid();
+            
+            // URL에서 만다라트 ID 확인
+            const urlParams = new URLSearchParams(window.location.search);
+            const mandartId = urlParams.get('id');
+            
+            if (mandartId) {
+                await loadMandart(mandartId);
+            } else {
+                initializeEmptyMandart();
+            }
+        });
+
+        // 인증 확인
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.user) {
+                        document.getElementById('userName').textContent = 
+                            result.user.fullName || result.user.username;
+                    }
+                }
+            } catch (error) {
+                console.error('인증 오류:', error);
+            }
+        }
+
+        // 에디터 초기화
+        async function initializeEditor() {
+            // 제목 입력 이벤트
+            document.getElementById('mandartTitle').addEventListener('input', (e) => {
+                currentMandart.title = e.target.value;
+            });
+        }
+
+        // 9x9 만다라트 그리드 생성
+        function createMandartGrid() {
+            const grid = document.getElementById('mandartGrid');
+            grid.innerHTML = '';
+
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    const cell = document.createElement('div');
+                    const position = row * gridSize + col;
+                    
+                    cell.className = 'mandart-cell';
+                    cell.dataset.position = position;
+                    cell.onclick = () => openCellEditor(position);
+
+                    // 셀 타입 결정
+                    const cellType = getCellType(row, col);
+                    if (cellType === 'center') {
+                        cell.classList.add('center');
+                    } else if (cellType === 'goal') {
+                        cell.classList.add('goal');
+                    } else {
+                        cell.classList.add('task');
+                    }
+
+                    // 위치 번호 표시
+                    const positionLabel = document.createElement('div');
+                    positionLabel.className = 'cell-position';
+                    positionLabel.textContent = position + 1;
+                    cell.appendChild(positionLabel);
+
+                    // 내용 영역
+                    const content = document.createElement('div');
+                    content.className = 'cell-content';
+                    content.id = `cell-content-${position}`;
+                    cell.appendChild(content);
+
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        // 셀 타입 결정 (중심, 목표, 과제)
+        function getCellType(row, col) {
+            // 중심 셀 (4,4)
+            if (row === 4 && col === 4) {
+                return 'center';
+            }
+            
+            // 목표 셀 (3x3 블록의 중심)
+            const goalPositions = [
+                [1, 1], [1, 4], [1, 7],  // 상단 3개 목표
+                [4, 1], [4, 7],          // 중간 2개 목표
+                [7, 1], [7, 4], [7, 7]   // 하단 3개 목표
+            ];
+            
+            for (const [gRow, gCol] of goalPositions) {
+                if (row === gRow && col === gCol) {
+                    return 'goal';
+                }
+            }
+            
+            return 'task';
+        }
+
+        // 빈 만다라트 초기화
+        function initializeEmptyMandart() {
+            currentMandart = {
+                id: null,
+                title: '새로운 만다라트',
+                description: '',
+                centerGoal: '',
+                goals: {},
+                tasks: {},
+                status: 'draft'
+            };
+            
+            document.getElementById('mandartTitle').value = currentMandart.title;
+            updateGridDisplay();
+        }
+
+        // 만다라트 로드
+        async function loadMandart(id) {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`/api/mandarts/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('만다라트를 불러올 수 없습니다.');
+                }
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    currentMandart = result.data;
+                    document.getElementById('mandartTitle').value = currentMandart.title;
+                    
+                    // 목표와 과제 데이터를 그리드 데이터로 변환
+                    processLoadedData(result.data);
+                    updateGridDisplay();
+                }
+            } catch (error) {
+                console.error('만다라트 로드 오류:', error);
+                alert('만다라트를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 로드된 데이터 처리
+        function processLoadedData(data) {
+            gridData = {};
+            
+            // 중심 목표 설정
+            if (data.centerGoal) {
+                gridData[40] = { // 중심 위치 (4,4 = 40)
+                    type: 'center',
+                    title: data.centerGoal,
+                    description: data.description || ''
+                };
+            }
+            
+            // 목표 데이터 처리
+            if (data.goals) {
+                data.goals.forEach(goal => {
+                    gridData[getPositionFromGoal(goal.position)] = {
+                        type: 'goal',
+                        title: goal.title,
+                        description: goal.description || '',
+                        id: goal.id,
+                        status: goal.status,
+                        progressPercent: goal.progressPercent
+                    };
+                });
+            }
+            
+            // 과제 데이터 처리
+            if (data.tasks) {
+                data.tasks.forEach(task => {
+                    const position = getPositionFromTask(task.goalId, task.position);
+                    if (position !== -1) {
+                        gridData[position] = {
+                            type: 'task',
+                            title: task.title,
+                            description: task.description || '',
+                            id: task.id,
+                            status: task.status,
+                            progressPercent: task.progressPercent
+                        };
+                    }
+                });
+            }
+        }
+
+        // 목표 위치를 그리드 위치로 변환
+        function getPositionFromGoal(goalPosition) {
+            const goalPositions = [10, 13, 16, 37, 43, 64, 67, 70]; // 8개 목표 위치
+            return goalPositions[goalPosition - 1] || -1;
+        }
+
+        // 과제 위치를 그리드 위치로 변환
+        function getPositionFromTask(goalId, taskPosition) {
+            // 목표별 과제 위치 매핑 (복잡한 로직이므로 간단히 처리)
+            return -1; // 구현 필요
+        }
+
+        // 그리드 표시 업데이트
+        function updateGridDisplay() {
+            for (let position = 0; position < 81; position++) {
+                const content = document.getElementById(`cell-content-${position}`);
+                const cell = content.parentElement;
+                
+                if (gridData[position]) {
+                    const data = gridData[position];
+                    content.textContent = data.title || '';
+                    cell.classList.add('has-content');
+                } else {
+                    content.textContent = '';
+                    cell.classList.remove('has-content');
+                }
+            }
+        }
+
+        // 셀 에디터 열기
+        function openCellEditor(position) {
+            const cellType = getCellTypeByPosition(position);
+            const data = gridData[position] || {};
+            
+            document.getElementById('sidebarTitle').textContent = 
+                cellType === 'center' ? '중심 목표 편집' :
+                cellType === 'goal' ? '목표 편집' : '과제 편집';
+            
+            showCellEditForm(position, cellType, data);
+            showSidebar();
+        }
+
+        // 위치로 셀 타입 확인
+        function getCellTypeByPosition(position) {
+            const row = Math.floor(position / 9);
+            const col = position % 9;
+            return getCellType(row, col);
+        }
+
+        // 셀 편집 폼 표시
+        function showCellEditForm(position, cellType, data) {
+            const content = document.getElementById('sidebarContent');
+            
+            const typeLabels = {
+                'center': '중심 목표',
+                'goal': '목표',
+                'task': '실천 과제'
+            };
+            
+            content.innerHTML = `
+                <div class="form-group">
+                    <label>유형</label>
+                    <input type="text" value="${typeLabels[cellType]}" readonly style="background: #f7fafc;">
+                </div>
+                
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" id="cellTitle" value="${data.title || ''}" placeholder="제목을 입력하세요">
+                </div>
+                
+                <div class="form-group">
+                    <label>설명</label>
+                    <textarea id="cellDescription" placeholder="상세 설명을 입력하세요">${data.description || ''}</textarea>
+                </div>
+                
+                ${cellType !== 'center' ? `
+                <div class="form-group">
+                    <label>상태</label>
+                    <select id="cellStatus">
+                        <option value="not_started" ${data.status === 'not_started' ? 'selected' : ''}>시작 전</option>
+                        <option value="in_progress" ${data.status === 'in_progress' ? 'selected' : ''}>진행 중</option>
+                        <option value="completed" ${data.status === 'completed' ? 'selected' : ''}>완료</option>
+                        <option value="on_hold" ${data.status === 'on_hold' ? 'selected' : ''}>보류</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>진행률 (%)</label>
+                    <input type="number" id="cellProgress" min="0" max="100" value="${data.progressPercent || 0}">
+                </div>
+                ` : ''}
+                
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="saveCellData(${position}, '${cellType}')" style="width: 100%; margin-bottom: 0.5rem;">
+                        저장
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearCellData(${position})" style="width: 100%;">
+                        지우기
+                    </button>
+                </div>
+            `;
+        }
+
+        // 셀 데이터 저장
+        function saveCellData(position, cellType) {
+            const title = document.getElementById('cellTitle').value.trim();
+            const description = document.getElementById('cellDescription').value.trim();
+            
+            if (!title) {
+                alert('제목을 입력해주세요.');
+                return;
+            }
+            
+            const cellData = {
+                type: cellType,
+                title: title,
+                description: description
+            };
+            
+            if (cellType !== 'center') {
+                const status = document.getElementById('cellStatus').value;
+                const progress = parseInt(document.getElementById('cellProgress').value) || 0;
+                
+                cellData.status = status;
+                cellData.progressPercent = progress;
+            }
+            
+            gridData[position] = cellData;
+            
+            // 중심 목표인 경우 현재 만다라트의 중심 목표도 업데이트
+            if (cellType === 'center') {
+                currentMandart.centerGoal = title;
+            }
+            
+            updateGridDisplay();
+            closeSidebar();
+        }
+
+        // 셀 데이터 지우기
+        function clearCellData(position) {
+            if (confirm('정말로 지우시겠습니까?')) {
+                delete gridData[position];
+                updateGridDisplay();
+                closeSidebar();
+            }
+        }
+
+        // 설정 표시
+        function showSettings() {
+            document.getElementById('sidebarTitle').textContent = '만다라트 설정';
+            
+            const content = document.getElementById('sidebarContent');
+            content.innerHTML = `
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" id="settingsTitle" value="${currentMandart.title}">
+                </div>
+                
+                <div class="form-group">
+                    <label>설명</label>
+                    <textarea id="settingsDescription" placeholder="만다라트에 대한 설명을 입력하세요">${currentMandart.description || ''}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>상태</label>
+                    <select id="settingsStatus">
+                        <option value="draft" ${currentMandart.status === 'draft' ? 'selected' : ''}>초안</option>
+                        <option value="active" ${currentMandart.status === 'active' ? 'selected' : ''}>활성</option>
+                        <option value="completed" ${currentMandart.status === 'completed' ? 'selected' : ''}>완료</option>
+                        <option value="archived" ${currentMandart.status === 'archived' ? 'selected' : ''}>보관</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>공개 설정</label>
+                    <select id="settingsPublic">
+                        <option value="false" ${!currentMandart.isPublic ? 'selected' : ''}>비공개</option>
+                        <option value="true" ${currentMandart.isPublic ? 'selected' : ''}>공개</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%;">
+                        설정 저장
+                    </button>
+                </div>
+                
+                <div class="progress-info">
+                    <h4 style="margin-bottom: 1rem; color: #4a5568;">진행 현황</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${calculateProgress()}%"></div>
+                    </div>
+                    <p style="text-align: center; margin-bottom: 1rem;">전체 진행률: ${calculateProgress()}%</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">${getCompletedGoals()}</div>
+                            <div class="stat-label">완료된 목표</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${getCompletedTasks()}</div>
+                            <div class="stat-label">완료된 과제</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${getTotalGoals()}</div>
+                            <div class="stat-label">전체 목표</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${getTotalTasks()}</div>
+                            <div class="stat-label">전체 과제</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showSidebar();
+        }
+
+        // 설정 저장
+        function saveSettings() {
+            currentMandart.title = document.getElementById('settingsTitle').value;
+            currentMandart.description = document.getElementById('settingsDescription').value;
+            currentMandart.status = document.getElementById('settingsStatus').value;
+            currentMandart.isPublic = document.getElementById('settingsPublic').value === 'true';
+            
+            document.getElementById('mandartTitle').value = currentMandart.title;
+            
+            closeSidebar();
+            alert('설정이 저장되었습니다.');
+        }
+
+        // 만다라트 저장
+        async function saveMandart(activate = false) {
+            if (!currentMandart.title.trim()) {
+                alert('제목을 입력해주세요.');
+                return;
+            }
+            
+            if (!currentMandart.centerGoal.trim()) {
+                alert('중심 목표를 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                const mandartData = {
+                    title: currentMandart.title,
+                    description: currentMandart.description,
+                    centerGoal: currentMandart.centerGoal,
+                    status: activate ? 'active' : currentMandart.status,
+                    isPublic: currentMandart.isPublic || false,
+                    sourceType: 'manual'
+                };
+                
+                let response;
+                if (currentMandart.id) {
+                    // 수정
+                    response = await fetch(`/api/mandarts/${currentMandart.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(mandartData)
+                    });
+                } else {
+                    // 생성
+                    response = await fetch('/api/mandarts', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(mandartData)
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error('저장 실패');
+                }
+                
+                const result = await response.json();
+                if (result.success) {
+                    currentMandart.id = result.data.id;
+                    
+                    // 목표와 과제 저장
+                    await saveGoalsAndTasks();
+                    
+                    alert(activate ? '만다라트가 활성화되었습니다!' : '만다라트가 저장되었습니다!');
+                    
+                    if (activate) {
+                        window.location.href = `/mandart-detail.html?id=${currentMandart.id}`;
+                    }
+                } else {
+                    throw new Error(result.message || '저장 실패');
+                }
+                
+            } catch (error) {
+                console.error('저장 오류:', error);
+                alert('저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 목표와 과제 저장
+        async function saveGoalsAndTasks() {
+            // 구현 필요: 그리드 데이터를 목표와 과제로 변환하여 저장
+            console.log('목표와 과제 저장 기능 구현 필요');
+        }
+
+        // 진행률 계산
+        function calculateProgress() {
+            const totalItems = Object.keys(gridData).length;
+            const completedItems = Object.values(gridData).filter(item => 
+                item.status === 'completed').length;
+            
+            return totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+        }
+
+        // 통계 함수들
+        function getCompletedGoals() {
+            return Object.values(gridData).filter(item => 
+                item.type === 'goal' && item.status === 'completed').length;
+        }
+
+        function getCompletedTasks() {
+            return Object.values(gridData).filter(item => 
+                item.type === 'task' && item.status === 'completed').length;
+        }
+
+        function getTotalGoals() {
+            return Object.values(gridData).filter(item => item.type === 'goal').length;
+        }
+
+        function getTotalTasks() {
+            return Object.values(gridData).filter(item => item.type === 'task').length;
+        }
+
+        // 사이드바 관리
+        function showSidebar() {
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('sidebar').classList.add('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('sidebar').classList.remove('active');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

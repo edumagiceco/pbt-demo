@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항 관리 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #e53e3e;
+        }
+        
+        .admin-header .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e53e3e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .admin-header .admin-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .admin-header .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .admin-header .nav-link:hover {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+        }
+        
+        .admin-header .nav-link.active {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+        }
+        
+        .admin-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-header .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+        
+        .add-announcement-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .add-announcement-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 161, 105, 0.3);
+        }
+        
+        .announcements-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .announcement-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.5rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+        
+        .announcement-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            margin: 0 -1rem;
+            padding: 1.5rem 1rem;
+            border-radius: 10px;
+        }
+        
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .announcement-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .announcement-title:hover {
+            color: #667eea;
+        }
+        
+        .announcement-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .announcement-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .announcement-status.published {
+            background: rgba(56, 161, 105, 0.1);
+            color: #38a169;
+        }
+        
+        .announcement-status.draft {
+            background: rgba(214, 158, 46, 0.1);
+            color: #d69e2e;
+        }
+        
+        .announcement-status.scheduled {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .announcement-content {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .announcement-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .action-btn.edit {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .action-btn.delete {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+        }
+        
+        .action-btn.toggle {
+            background: rgba(214, 158, 46, 0.1);
+            color: #d69e2e;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .filters-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .filter-input, .filter-select {
+            padding: 0.7rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+        
+        .empty-state h3 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .modal-header h2 {
+            color: #4a5568;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .announcement-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .announcement-meta {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="logo">
+            🛡️ 관리자 대시보드
+        </div>
+        <nav class="admin-nav">
+            <a href="/admin-dashboard.html" class="nav-link">대시보드</a>
+            <a href="/admin-users.html" class="nav-link">사용자 관리</a>
+            <a href="/admin-courses.html" class="nav-link">과정 관리</a>
+            <a href="/admin-announcements.html" class="nav-link active">공지사항</a>
+            <a href="/admin-analytics.html" class="nav-link">분석</a>
+        </nav>
+        <div class="user-info">
+            <span id="adminName">관리자</span>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>📢 공지사항 관리</h1>
+                <p>시스템 공지사항과 알림을 관리하세요</p>
+            </div>
+            <button class="add-announcement-btn" onclick="showAddModal()">
+                ➕ 공지사항 작성
+            </button>
+        </div>
+        
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">검색</label>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="제목, 내용으로 검색...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">상태</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">전체</option>
+                        <option value="published">게시됨</option>
+                        <option value="draft">임시저장</option>
+                        <option value="scheduled">예약됨</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">작성일</label>
+                    <select id="dateFilter" class="filter-select">
+                        <option value="">전체</option>
+                        <option value="today">오늘</option>
+                        <option value="week">이번 주</option>
+                        <option value="month">이번 달</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>공지사항을 불러오는 중...</p>
+        </div>
+        
+        <div id="announcementsContainer" class="announcements-container" style="display: none;">
+            <div id="announcementsList">
+                <!-- 공지사항 목록이 여기에 동적으로 추가됩니다 -->
+            </div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <h3>📝 등록된 공지사항이 없습니다</h3>
+                <p>새로운 공지사항을 작성해보세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공지사항 작성/편집 모달 -->
+    <div id="announcementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">공지사항 작성</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="announcementForm">
+                <div class="form-group">
+                    <label class="form-label">제목</label>
+                    <input type="text" id="titleInput" class="form-input" placeholder="공지사항 제목을 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">내용</label>
+                    <textarea id="contentInput" class="form-textarea" placeholder="공지사항 내용을 입력하세요" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">상태</label>
+                    <select id="statusInput" class="form-select">
+                        <option value="published">즉시 게시</option>
+                        <option value="draft">임시저장</option>
+                        <option value="scheduled">예약 게시</option>
+                    </select>
+                </div>
+                <div class="form-group" id="scheduleDateGroup" style="display: none;">
+                    <label class="form-label">게시 예정일</label>
+                    <input type="datetime-local" id="scheduleDateInput" class="form-input">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 공지사항 데이터
+        let allAnnouncements = [
+            {
+                id: 1,
+                title: "시스템 점검 안내",
+                content: "2025년 5월 26일 새벽 2시부터 4시까지 시스템 점검이 진행됩니다. 해당 시간 동안 서비스 이용이 제한될 수 있습니다.",
+                status: "published",
+                author: "시스템 관리자",
+                createdAt: "2025-05-25T10:30:00",
+                updatedAt: "2025-05-25T10:30:00",
+                views: 1247
+            },
+            {
+                id: 2,
+                title: "새로운 과정 '머신러닝 심화' 개설",
+                content: "AI/ML 분야의 심화 과정이 새롭게 개설되었습니다. 기존 머신러닝 기초 과정을 수료한 학습자들을 대상으로 합니다.",
+                status: "published",
+                author: "교육팀",
+                createdAt: "2025-05-24T15:20:00",
+                updatedAt: "2025-05-24T15:20:00",
+                views: 892
+            },
+            {
+                id: 3,
+                title: "모바일 앱 출시 예정",
+                content: "PBT LMS 모바일 앱이 곧 출시될 예정입니다. 더욱 편리한 학습 환경을 제공할 예정이니 많은 관심 부탁드립니다.",
+                status: "draft",
+                author: "개발팀",
+                createdAt: "2025-05-23T09:15:00",
+                updatedAt: "2025-05-25T11:45:00",
+                views: 0
+            },
+            {
+                id: 4,
+                title: "여름 특별 강좌 신청 안내",
+                content: "7월부터 시작되는 여름 특별 강좌 신청이 6월 1일부터 시작됩니다. 조기 신청 시 할인 혜택이 제공됩니다.",
+                status: "scheduled",
+                author: "교육팀",
+                createdAt: "2025-05-22T14:30:00",
+                updatedAt: "2025-05-22T14:30:00",
+                scheduledDate: "2025-06-01T09:00:00",
+                views: 0
+            },
+            {
+                id: 5,
+                title: "학습 진도 관리 기능 업데이트",
+                content: "학습자들의 진도를 더욱 효과적으로 관리할 수 있는 새로운 기능이 추가되었습니다. 상세한 학습 통계와 성취도 분석이 가능합니다.",
+                status: "published",
+                author: "개발팀",
+                createdAt: "2025-05-20T16:45:00",
+                updatedAt: "2025-05-20T16:45:00",
+                views: 1543
+            }
+        ];
+
+        let filteredAnnouncements = [...allAnnouncements];
+        let currentAdmin = null;
+        let editingAnnouncementId = null;
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 관리자 인증 확인
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    currentAdmin = user;
+                    
+                    if (user.userType !== 'admin') {
+                        alert('관리자 권한이 필요합니다.');
+                        window.location.href = '/dashboard.html';
+                        return;
+                    }
+                    
+                    document.getElementById('adminName').textContent = user.fullName || '관리자';
+                } else {
+                    currentAdmin = { id: 1, fullName: '시스템 관리자', userType: 'admin' };
+                    document.getElementById('adminName').textContent = currentAdmin.fullName;
+                }
+            } catch (error) {
+                currentAdmin = { id: 1, fullName: '시스템 관리자', userType: 'admin' };
+                document.getElementById('adminName').textContent = currentAdmin.fullName;
+            }
+            
+            // 공지사항 목록 로드
+            setTimeout(() => {
+                loadAnnouncements();
+            }, 1000);
+            
+            // 필터 이벤트 리스너
+            document.getElementById('searchInput').addEventListener('input', filterAnnouncements);
+            document.getElementById('statusFilter').addEventListener('change', filterAnnouncements);
+            document.getElementById('dateFilter').addEventListener('change', filterAnnouncements);
+            
+            // 폼 이벤트 리스너
+            document.getElementById('statusInput').addEventListener('change', toggleScheduleDate);
+            document.getElementById('announcementForm').addEventListener('submit', saveAnnouncement);
+        });
+
+        // 공지사항 목록 로드
+        function loadAnnouncements() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('announcementsContainer').style.display = 'block';
+            renderAnnouncements();
+        }
+
+        // 공지사항 목록 렌더링
+        function renderAnnouncements() {
+            const announcementsList = document.getElementById('announcementsList');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredAnnouncements.length === 0) {
+                announcementsList.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            announcementsList.innerHTML = filteredAnnouncements.map(announcement => `
+                <div class="announcement-item">
+                    <div class="announcement-header">
+                        <div>
+                            <div class="announcement-title" onclick="viewAnnouncement(${announcement.id})">
+                                ${announcement.title}
+                            </div>
+                            <div class="announcement-meta">
+                                <span>👤 ${announcement.author}</span>
+                                <span>📅 ${formatDateTime(announcement.createdAt)}</span>
+                                <span>👁️ ${announcement.views.toLocaleString()}회</span>
+                                ${announcement.status === 'scheduled' ? 
+                                    `<span>⏰ ${formatDateTime(announcement.scheduledDate)} 예약</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="announcement-status ${announcement.status}">
+                                ${announcement.status === 'published' ? '게시됨' : 
+                                  announcement.status === 'draft' ? '임시저장' : '예약됨'}
+                            </span>
+                            <div class="announcement-actions">
+                                <button class="action-btn edit" onclick="editAnnouncement(${announcement.id})">
+                                    ✏️ 편집
+                                </button>
+                                <button class="action-btn toggle" onclick="toggleAnnouncementStatus(${announcement.id})">
+                                    ${announcement.status === 'published' ? '🔒 비공개' : '📢 게시'}
+                                </button>
+                                <button class="action-btn delete" onclick="deleteAnnouncement(${announcement.id})">
+                                    🗑️ 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="announcement-content">
+                        ${announcement.content}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 공지사항 필터링
+        function filterAnnouncements() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            filteredAnnouncements = allAnnouncements.filter(announcement => {
+                const matchesSearch = announcement.title.toLowerCase().includes(searchTerm) ||
+                                    announcement.content.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || announcement.status === statusFilter;
+                
+                let matchesDate = true;
+                if (dateFilter) {
+                    const announcementDate = new Date(announcement.createdAt);
+                    const now = new Date();
+                    
+                    switch (dateFilter) {
+                        case 'today':
+                            matchesDate = announcementDate.toDateString() === now.toDateString();
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            matchesDate = announcementDate >= weekAgo;
+                            break;
+                        case 'month':
+                            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                            matchesDate = announcementDate >= monthAgo;
+                            break;
+                    }
+                }
+                
+                return matchesSearch && matchesStatus && matchesDate;
+            });
+            
+            renderAnnouncements();
+        }
+
+        // 공지사항 작성 모달 표시
+        function showAddModal() {
+            editingAnnouncementId = null;
+            document.getElementById('modalTitle').textContent = '공지사항 작성';
+            document.getElementById('announcementForm').reset();
+            document.getElementById('announcementModal').style.display = 'block';
+        }
+
+        // 공지사항 편집
+        function editAnnouncement(id) {
+            const announcement = allAnnouncements.find(a => a.id === id);
+            if (announcement) {
+                editingAnnouncementId = id;
+                document.getElementById('modalTitle').textContent = '공지사항 편집';
+                document.getElementById('titleInput').value = announcement.title;
+                document.getElementById('contentInput').value = announcement.content;
+                document.getElementById('statusInput').value = announcement.status;
+                
+                if (announcement.scheduledDate) {
+                    const scheduledDate = new Date(announcement.scheduledDate);
+                    const localDateTime = new Date(scheduledDate.getTime() - scheduledDate.getTimezoneOffset() * 60000)
+                        .toISOString().slice(0, 16);
+                    document.getElementById('scheduleDateInput').value = localDateTime;
+                }
+                
+                toggleScheduleDate();
+                document.getElementById('announcementModal').style.display = 'block';
+            }
+        }
+
+        // 공지사항 상태 토글
+        function toggleAnnouncementStatus(id) {
+            const announcement = allAnnouncements.find(a => a.id === id);
+            if (announcement) {
+                const newStatus = announcement.status === 'published' ? 'draft' : 'published';
+                const action = newStatus === 'published' ? '게시' : '비공개';
+                
+                if (confirm(`정말 "${announcement.title}" 공지사항을 ${action}하시겠습니까?`)) {
+                    announcement.status = newStatus;
+                    announcement.updatedAt = new Date().toISOString();
+                    filterAnnouncements();
+                    alert(`공지사항이 ${action}되었습니다.`);
+                }
+            }
+        }
+
+        // 공지사항 삭제
+        function deleteAnnouncement(id) {
+            const announcement = allAnnouncements.find(a => a.id === id);
+            if (announcement) {
+                if (confirm(`정말 "${announcement.title}" 공지사항을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                    allAnnouncements = allAnnouncements.filter(a => a.id !== id);
+                    filteredAnnouncements = filteredAnnouncements.filter(a => a.id !== id);
+                    renderAnnouncements();
+                    alert('공지사항이 삭제되었습니다.');
+                }
+            }
+        }
+
+        // 공지사항 보기
+        function viewAnnouncement(id) {
+            const announcement = allAnnouncements.find(a => a.id === id);
+            if (announcement) {
+                announcement.views += 1;
+                alert(`공지사항 상세보기:\n\n제목: ${announcement.title}\n\n내용: ${announcement.content}`);
+                renderAnnouncements();
+            }
+        }
+
+        // 예약 날짜 필드 토글
+        function toggleScheduleDate() {
+            const statusInput = document.getElementById('statusInput');
+            const scheduleDateGroup = document.getElementById('scheduleDateGroup');
+            
+            if (statusInput.value === 'scheduled') {
+                scheduleDateGroup.style.display = 'block';
+                document.getElementById('scheduleDateInput').required = true;
+            } else {
+                scheduleDateGroup.style.display = 'none';
+                document.getElementById('scheduleDateInput').required = false;
+            }
+        }
+
+        // 공지사항 저장
+        function saveAnnouncement(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('titleInput').value;
+            const content = document.getElementById('contentInput').value;
+            const status = document.getElementById('statusInput').value;
+            const scheduleDate = document.getElementById('scheduleDateInput').value;
+            
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+            
+            if (status === 'scheduled' && !scheduleDate) {
+                alert('예약 게시일을 선택해주세요.');
+                return;
+            }
+            
+            const announcementData = {
+                title,
+                content,
+                status,
+                author: currentAdmin.fullName,
+                updatedAt: new Date().toISOString()
+            };
+            
+            if (status === 'scheduled' && scheduleDate) {
+                announcementData.scheduledDate = new Date(scheduleDate).toISOString();
+            }
+            
+            if (editingAnnouncementId) {
+                // 편집 모드
+                const index = allAnnouncements.findIndex(a => a.id === editingAnnouncementId);
+                if (index !== -1) {
+                    allAnnouncements[index] = { ...allAnnouncements[index], ...announcementData };
+                    alert('공지사항이 수정되었습니다.');
+                }
+            } else {
+                // 새 공지사항 생성
+                const newAnnouncement = {
+                    id: Math.max(...allAnnouncements.map(a => a.id)) + 1,
+                    ...announcementData,
+                    createdAt: new Date().toISOString(),
+                    views: 0
+                };
+                allAnnouncements.unshift(newAnnouncement);
+                alert('공지사항이 작성되었습니다.');
+            }
+            
+            closeModal();
+            filterAnnouncements();
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('announcementModal').style.display = 'none';
+            document.getElementById('announcementForm').reset();
+            editingAnnouncementId = null;
+        }
+
+        // 날짜시간 포맷팅
+        function formatDateTime(dateTimeString) {
+            return new Date(dateTimeString).toLocaleString('ko-KR');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('정말 로그아웃하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                alert('로그아웃되었습니다.');
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('announcementModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

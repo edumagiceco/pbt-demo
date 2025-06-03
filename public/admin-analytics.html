@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>분석 보고서 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #e53e3e;
+        }
+        
+        .admin-header .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e53e3e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .admin-header .admin-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .admin-header .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .admin-header .nav-link:hover {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+        }
+        
+        .admin-header .nav-link.active {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+        }
+        
+        .admin-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-header .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+        
+        .export-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 161, 105, 0.3);
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .analytics-card h3 {
+            color: #4a5568;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chart-container {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            position: relative;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+        
+        .trend-up {
+            color: #38a169;
+        }
+        
+        .trend-down {
+            color: #e53e3e;
+        }
+        
+        .data-table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .data-table h3 {
+            color: #4a5568;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .filter-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .filter-select {
+            padding: 0.7rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="logo">
+            🛡️ 관리자 대시보드
+        </div>
+        <nav class="admin-nav">
+            <a href="/admin-dashboard.html" class="nav-link">대시보드</a>
+            <a href="/admin-users.html" class="nav-link">사용자 관리</a>
+            <a href="/admin-courses.html" class="nav-link">과정 관리</a>
+            <a href="/admin-announcements.html" class="nav-link">공지사항</a>
+            <a href="/admin-analytics.html" class="nav-link active">분석</a>
+        </nav>
+        <div class="user-info">
+            <span id="adminName">관리자</span>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>📈 분석 보고서</h1>
+                <p>플랫폼의 상세 분석 데이터와 인사이트를 확인하세요</p>
+            </div>
+            <button class="export-btn" onclick="exportReport()">
+                📊 보고서 내보내기
+            </button>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">기간</label>
+                    <select id="periodFilter" class="filter-select" onchange="updateAnalytics()">
+                        <option value="week">지난 7일</option>
+                        <option value="month">지난 30일</option>
+                        <option value="quarter">지난 3개월</option>
+                        <option value="year">지난 1년</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">카테고리</label>
+                    <select id="categoryFilter" class="filter-select" onchange="updateAnalytics()">
+                        <option value="">전체</option>
+                        <option value="frontend">프론트엔드</option>
+                        <option value="backend">백엔드</option>
+                        <option value="mobile">모바일</option>
+                        <option value="data">데이터 사이언스</option>
+                        <option value="ai">AI/ML</option>
+                        <option value="devops">DevOps</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">사용자 유형</label>
+                    <select id="userTypeFilter" class="filter-select" onchange="updateAnalytics()">
+                        <option value="">전체</option>
+                        <option value="student">학습자</option>
+                        <option value="instructor">강사</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>분석 데이터를 불러오는 중...</p>
+        </div>
+        
+        <div id="analyticsContent" style="display: none;">
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>📊 사용자 활동</h3>
+                    <div class="chart-container" id="userActivityChart">
+                        <!-- 사용자 활동 차트 -->
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <h3>📚 과정별 수강률</h3>
+                    <div class="chart-container" id="courseEnrollmentChart">
+                        <!-- 과정별 수강률 차트 -->
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <h3>⏱️ 학습 시간 분석</h3>
+                    <div class="chart-container" id="learningTimeChart">
+                        <!-- 학습 시간 분석 차트 -->
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <h3>🎯 완료율 통계</h3>
+                    <div class="metric-item">
+                        <span class="metric-label">전체 과정 완료율</span>
+                        <span class="metric-value">73%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 73%"></div>
+                    </div>
+                    
+                    <div class="metric-item">
+                        <span class="metric-label">JavaScript 기초</span>
+                        <span class="metric-value">85%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    
+                    <div class="metric-item">
+                        <span class="metric-label">React 실전</span>
+                        <span class="metric-value">68%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 68%"></div>
+                    </div>
+                    
+                    <div class="metric-item">
+                        <span class="metric-label">Python 데이터분석</span>
+                        <span class="metric-value">71%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 71%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <h3>📋 인기 과정 순위</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>순위</th>
+                            <th>과정명</th>
+                            <th>수강생 수</th>
+                            <th>완료율</th>
+                            <th>평점</th>
+                            <th>증감</th>
+                        </tr>
+                    </thead>
+                    <tbody id="popularCoursesTable">
+                        <!-- 인기 과정 데이터가 여기에 추가됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>👥 사용자 통계</h3>
+                    <div class="metric-item">
+                        <span class="metric-label">신규 가입자 (이번 주)</span>
+                        <span class="metric-value">
+                            24명
+                            <span class="trend-indicator trend-up">↗ +18%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">활성 사용자 (오늘)</span>
+                        <span class="metric-value">
+                            1,247명
+                            <span class="trend-indicator trend-up">↗ +5%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">평균 세션 시간</span>
+                        <span class="metric-value">
+                            45분
+                            <span class="trend-indicator trend-up">↗ +12%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">이탈률</span>
+                        <span class="metric-value">
+                            12%
+                            <span class="trend-indicator trend-down">↘ -3%</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <h3>💰 수익 분석</h3>
+                    <div class="metric-item">
+                        <span class="metric-label">이번 달 매출</span>
+                        <span class="metric-value">
+                            ₩12,450,000
+                            <span class="trend-indicator trend-up">↗ +25%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">평균 과정 가격</span>
+                        <span class="metric-value">₩127,000</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">결제 완료율</span>
+                        <span class="metric-value">
+                            89%
+                            <span class="trend-indicator trend-up">↗ +2%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">환불률</span>
+                        <span class="metric-value">
+                            3.2%
+                            <span class="trend-indicator trend-down">↘ -0.8%</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <h3>🎓 학습 성과</h3>
+                    <div class="metric-item">
+                        <span class="metric-label">과정 완주자</span>
+                        <span class="metric-value">
+                            847명
+                            <span class="trend-indicator trend-up">↗ +15%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">평균 학습 진도</span>
+                        <span class="metric-value">67%</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">문제 정답률</span>
+                        <span class="metric-value">
+                            78%
+                            <span class="trend-indicator trend-up">↗ +4%</span>
+                        </span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">과제 제출률</span>
+                        <span class="metric-value">
+                            92%
+                            <span class="trend-indicator trend-up">↗ +7%</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 분석 데이터
+        const analyticsData = {
+            popularCourses: [
+                {
+                    rank: 1,
+                    name: "JavaScript 기초 프로그래밍",
+                    students: 1247,
+                    completion: 85,
+                    rating: 4.8,
+                    change: "+12%"
+                },
+                {
+                    rank: 2,
+                    name: "Python 데이터 분석",
+                    students: 1156,
+                    completion: 71,
+                    rating: 4.6,
+                    change: "+8%"
+                },
+                {
+                    rank: 3,
+                    name: "React 실전 프로젝트",
+                    students: 892,
+                    completion: 68,
+                    rating: 4.9,
+                    change: "+15%"
+                },
+                {
+                    rank: 4,
+                    name: "머신러닝 기초",
+                    students: 789,
+                    completion: 62,
+                    rating: 4.8,
+                    change: "+5%"
+                },
+                {
+                    rank: 5,
+                    name: "Vue.js 완전 정복",
+                    students: 723,
+                    completion: 74,
+                    rating: 4.6,
+                    change: "-2%"
+                },
+                {
+                    rank: 6,
+                    name: "Node.js 백엔드 개발",
+                    students: 654,
+                    completion: 69,
+                    rating: 4.7,
+                    change: "+10%"
+                }
+            ]
+        };
+
+        let currentAdmin = null;
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 관리자 인증 확인
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    currentAdmin = user;
+                    
+                    if (user.userType !== 'admin') {
+                        alert('관리자 권한이 필요합니다.');
+                        window.location.href = '/dashboard.html';
+                        return;
+                    }
+                    
+                    document.getElementById('adminName').textContent = user.fullName || '관리자';
+                } else {
+                    currentAdmin = { id: 1, fullName: '시스템 관리자', userType: 'admin' };
+                    document.getElementById('adminName').textContent = currentAdmin.fullName;
+                }
+            } catch (error) {
+                currentAdmin = { id: 1, fullName: '시스템 관리자', userType: 'admin' };
+                document.getElementById('adminName').textContent = currentAdmin.fullName;
+            }
+            
+            // 분석 데이터 로드
+            setTimeout(() => {
+                loadAnalytics();
+            }, 1500);
+        });
+
+        // 분석 데이터 로드
+        function loadAnalytics() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('analyticsContent').style.display = 'block';
+            
+            renderCharts();
+            renderPopularCoursesTable();
+        }
+
+        // 차트 렌더링
+        function renderCharts() {
+            // 사용자 활동 차트
+            document.getElementById('userActivityChart').innerHTML = `
+                <div style="width: 100%; height: 200px; display: flex; align-items: end; justify-content: space-around; gap: 1rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 120px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">월</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 90px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">화</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 150px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">수</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 180px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">목</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 140px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">금</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 80px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">토</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 60px; width: 25px; border-radius: 4px;"></div>
+                        <span style="font-size: 0.8rem;">일</span>
+                    </div>
+                </div>
+            `;
+
+            // 과정별 수강률 차트 (도넛 차트 시뮬레이션)
+            document.getElementById('courseEnrollmentChart').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #667eea;">● JavaScript</span>
+                        <span style="font-weight: 600;">35%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #38a169;">● Python</span>
+                        <span style="font-weight: 600;">28%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #e53e3e;">● React</span>
+                        <span style="font-weight: 600;">22%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #d69e2e;">● 기타</span>
+                        <span style="font-weight: 600;">15%</span>
+                    </div>
+                </div>
+            `;
+
+            // 학습 시간 분석 차트
+            document.getElementById('learningTimeChart').innerHTML = `
+                <div style="width: 100%; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>평균 일일 학습시간</span>
+                        <span style="font-weight: 600; color: #667eea;">2.3시간</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>최대 학습시간</span>
+                        <span style="font-weight: 600; color: #38a169;">8.5시간</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>주말 학습률</span>
+                        <span style="font-weight: 600; color: #d69e2e;">45%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>모바일 학습률</span>
+                        <span style="font-weight: 600; color: #e53e3e;">32%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 인기 과정 테이블 렌더링
+        function renderPopularCoursesTable() {
+            const tbody = document.getElementById('popularCoursesTable');
+            tbody.innerHTML = analyticsData.popularCourses.map(course => `
+                <tr>
+                    <td><strong>${course.rank}</strong></td>
+                    <td>${course.name}</td>
+                    <td>${course.students.toLocaleString()}명</td>
+                    <td>${course.completion}%</td>
+                    <td>⭐ ${course.rating}</td>
+                    <td>
+                        <span class="trend-indicator ${course.change.startsWith('+') ? 'trend-up' : 'trend-down'}">
+                            ${course.change.startsWith('+') ? '↗' : '↘'} ${course.change}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 분석 데이터 업데이트
+        function updateAnalytics() {
+            const period = document.getElementById('periodFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            const userType = document.getElementById('userTypeFilter').value;
+            
+            // 실제 구현에서는 여기서 API 호출하여 필터링된 데이터를 가져옴
+            console.log('Analytics updated with filters:', { period, category, userType });
+            
+            // 간단한 애니메이션으로 업데이트 시뮬레이션
+            document.getElementById('analyticsContent').style.opacity = '0.5';
+            setTimeout(() => {
+                document.getElementById('analyticsContent').style.opacity = '1';
+                alert(`분석 데이터가 업데이트되었습니다.\n기간: ${period}\n카테고리: ${category || '전체'}\n사용자: ${userType || '전체'}`);
+            }, 500);
+        }
+
+        // 보고서 내보내기
+        function exportReport() {
+            const period = document.getElementById('periodFilter').value;
+            const timestamp = new Date().toLocaleString('ko-KR');
+            
+            alert(`📊 분석 보고서 내보내기\n\n기간: ${period}\n생성일시: ${timestamp}\n\n보고서가 생성되었습니다.\n(실제 구현에서는 Excel/PDF 파일이 다운로드됩니다)`);
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('정말 로그아웃하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                alert('로그아웃되었습니다.');
+                window.location.href = '/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

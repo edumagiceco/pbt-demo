@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 제출 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 0.5rem;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .assignment-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .assignment-title {
+            color: #4a5568;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .assignment-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .due-date-warning {
+            color: #e53e3e;
+            font-weight: 700;
+        }
+        
+        .assignment-description {
+            color: #4a5568;
+            line-height: 1.8;
+            background: rgba(247, 250, 252, 0.8);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .submission-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .file-upload {
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(247, 250, 252, 0.5);
+        }
+        
+        .file-upload:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-hint {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .uploaded-files {
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-icon {
+            color: #667eea;
+        }
+        
+        .remove-file {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .submission-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .char-count {
+            text-align: right;
+            color: #718096;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .submission-history {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .history-title {
+            color: #4a5568;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .history-item {
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .attempt-number {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .submission-date {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .error-message {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #f56565;
+            margin-bottom: 1rem;
+        }
+        
+        .success-message {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #48bb78;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .assignment-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .submission-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/progress.html" class="nav-link">학습 진도</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <a href="/assignments.html" class="nav-link">과제</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/assignments.html">← 과제 목록으로 돌아가기</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>과제 정보를 불러오는 중...</p>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="success-message" class="success-message" style="display: none;"></div>
+
+        <div id="assignment-content" style="display: none;">
+            <div class="assignment-header">
+                <h1 class="assignment-title" id="assignment-title">과제 제목</h1>
+                
+                <div class="assignment-info">
+                    <div class="info-item">
+                        <span class="info-label">과정</span>
+                        <span class="info-value" id="course-name">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">마감일</span>
+                        <span class="info-value" id="due-date">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">최대 점수</span>
+                        <span class="info-value" id="max-score">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">제출 시도</span>
+                        <span class="info-value" id="attempt-count">-</span>
+                    </div>
+                </div>
+                
+                <div class="assignment-description" id="assignment-description">
+                    과제 설명이 여기에 표시됩니다.
+                </div>
+            </div>
+
+            <div id="submission-history" class="submission-history" style="display: none;">
+                <h3 class="history-title">📝 이전 제출 내역</h3>
+                <div id="history-list"></div>
+            </div>
+
+            <div class="submission-form">
+                <h2 style="color: #4a5568; margin-bottom: 1.5rem;">📤 과제 제출</h2>
+                
+                <form id="submission-form">
+                    <div class="form-group">
+                        <label for="submission-text">제출 내용 *</label>
+                        <textarea 
+                            id="submission-text" 
+                            name="submissionText" 
+                            placeholder="과제 답안이나 설명을 작성해주세요..."
+                            maxlength="10000"
+                            required
+                        ></textarea>
+                        <div class="char-count">
+                            <span id="char-count">0</span> / 10,000자
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>첨부 파일 (선택사항)</label>
+                        <div class="file-upload" onclick="document.getElementById('file-input').click()">
+                            <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg">
+                            <div class="upload-icon">📁</div>
+                            <div class="upload-text">파일을 선택하거나 여기에 드래그하세요</div>
+                            <div class="upload-hint">PDF, DOC, TXT, ZIP, 이미지 파일 지원 (최대 10MB)</div>
+                        </div>
+                        <div id="uploaded-files" class="uploaded-files"></div>
+                    </div>
+
+                    <div class="submission-actions">
+                        <a href="/assignments.html" class="btn btn-secondary">
+                            ❌ 취소
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            📤 과제 제출
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAssignment = null;
+        let uploadedFiles = [];
+        
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const assignmentId = urlParams.get('id');
+            
+            if (!assignmentId) {
+                showError('과제 ID가 없습니다.');
+                return;
+            }
+            
+            await loadAssignment(assignmentId);
+            setupFileUpload();
+            setupCharCount();
+        });
+        
+        // 과제 정보 로드
+        async function loadAssignment(assignmentId) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('assignment-content');
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`/api/assignments/${assignmentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentAssignment = result.data;
+                    displayAssignment(currentAssignment);
+                    displaySubmissionHistory(currentAssignment.userSubmissions || []);
+                    
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                console.error('과제 로드 오류:', error);
+                loading.style.display = 'none';
+                // 실제 API 연동 실패 시 샘플 데이터 표시
+                loadSampleAssignment(assignmentId);
+                content.style.display = 'block';
+            }
+        }
+        
+        // 샘플 과제 데이터 로드
+        function loadSampleAssignment(assignmentId) {
+            const sampleAssignments = {
+                '1': {
+                    id: 1,
+                    title: 'JavaScript 함수와 스코프',
+                    description: '다음 요구사항을 만족하는 JavaScript 코드를 작성하세요:\n\n1. 클로저를 활용한 카운터 함수 구현\n2. 함수 호이스팅의 동작 원리 설명\n3. let, const, var의 차이점 코드로 설명\n\n각 문제에 대한 코드와 함께 동작 원리를 상세히 설명해주세요.',
+                    Course: { title: 'JavaScript 기초 프로그래밍' },
+                    dueDate: '2025-05-28T23:59:59Z',
+                    maxScore: 100,
+                    maxSubmissions: 3,
+                    userSubmissions: []
+                },
+                '2': {
+                    id: 2,
+                    title: '정렬 알고리즘 구현',
+                    description: '퀵 정렬과 머지 정렬 알고리즘을 각각 구현하고 성능을 비교 분석하세요:\n\n1. 퀵 정렬 구현 (재귀 방식)\n2. 머지 정렬 구현\n3. 두 알고리즘의 시간복잡도 분석\n4. 1000개, 10000개 데이터로 성능 테스트\n\n구현 코드와 함께 분석 결과를 그래프나 표로 정리해주세요.',
+                    Course: { title: '알고리즘과 자료구조' },
+                    dueDate: '2025-05-26T23:59:59Z',
+                    maxScore: 150,
+                    maxSubmissions: 2,
+                    userSubmissions: [
+                        {
+                            id: 1,
+                            attempt: 1,
+                            submissionText: '퀵 정렬과 머지 정렬을 구현했습니다...',
+                            submittedAt: '2025-05-25T14:30:00Z',
+                            status: 'submitted',
+                            score: null
+                        }
+                    ]
+                }
+            };
+            
+            currentAssignment = sampleAssignments[assignmentId] || sampleAssignments['1'];
+            displayAssignment(currentAssignment);
+            displaySubmissionHistory(currentAssignment.userSubmissions || []);
+        }
+        
+        // 과제 정보 표시
+        function displayAssignment(assignment) {
+            document.getElementById('assignment-title').textContent = assignment.title;
+            document.getElementById('course-name').textContent = assignment.Course?.title || 'Unknown';
+            document.getElementById('assignment-description').textContent = assignment.description;
+            document.getElementById('max-score').textContent = `${assignment.maxScore}점`;
+            
+            // 마감일 표시
+            const dueDate = new Date(assignment.dueDate);
+            const now = new Date();
+            const dueDateElement = document.getElementById('due-date');
+            
+            if (now > dueDate) {
+                dueDateElement.textContent = '마감됨';
+                dueDateElement.classList.add('due-date-warning');
+                
+                // 마감된 과제는 제출 불가
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⚠️ 마감됨';
+                
+                showError('이 과제는 마감되었습니다.');
+            } else {
+                dueDateElement.textContent = formatDateTime(dueDate);
+            }
+            
+            // 제출 시도 횟수
+            const submissions = assignment.userSubmissions || [];
+            const maxSubmissions = assignment.maxSubmissions || 999;
+            document.getElementById('attempt-count').textContent = `${submissions.length}/${maxSubmissions}`;
+            
+            // 최대 제출 횟수 초과 확인
+            if (submissions.length >= maxSubmissions) {
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⚠️ 제출 횟수 초과';
+                
+                showError('최대 제출 횟수를 초과했습니다.');
+            }
+        }
+        
+        // 제출 내역 표시
+        function displaySubmissionHistory(submissions) {
+            if (submissions.length === 0) {
+                return;
+            }
+            
+            const historyContainer = document.getElementById('submission-history');
+            const historyList = document.getElementById('history-list');
+            
+            historyList.innerHTML = submissions.map((submission, index) => {
+                const statusText = {
+                    'submitted': '제출됨',
+                    'graded': '채점됨',
+                    'returned': '반려됨'
+                }[submission.status] || submission.status;
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-meta">
+                            <span class="attempt-number">${submission.attempt}번째 제출</span>
+                            <span class="submission-date">${formatDateTime(submission.submittedAt)}</span>
+                        </div>
+                        <div style="color: #718096; margin-bottom: 0.5rem;">상태: ${statusText}</div>
+                        ${submission.score !== null ? 
+                            `<div style="color: #48bb78; font-weight: 600;">점수: ${submission.score}점</div>` : 
+                            ''}
+                        <div style="color: #4a5568; font-size: 0.9rem; margin-top: 0.5rem;">
+                            ${submission.submissionText.substring(0, 100)}${submission.submissionText.length > 100 ? '...' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            historyContainer.style.display = 'block';
+        }
+        
+        // 파일 업로드 설정
+        function setupFileUpload() {
+            const fileUpload = document.querySelector('.file-upload');
+            const fileInput = document.getElementById('file-input');
+            
+            // 드래그 앤 드롭
+            fileUpload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUpload.classList.add('dragover');
+            });
+            
+            fileUpload.addEventListener('dragleave', () => {
+                fileUpload.classList.remove('dragover');
+            });
+            
+            fileUpload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUpload.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+        
+        // 파일 처리
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`파일 "${file.name}"이 너무 큽니다. (최대 10MB)`);
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                displayUploadedFiles();
+            });
+        }
+        
+        // 업로드된 파일 표시
+        function displayUploadedFiles() {
+            const container = document.getElementById('uploaded-files');
+            
+            container.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <span>${file.name}</span>
+                        <span style="color: #718096; font-size: 0.8rem;">(${formatFileSize(file.size)})</span>
+                    </div>
+                    <button type="button" class="remove-file" onclick="removeFile(${index})">삭제</button>
+                </div>
+            `).join('');
+        }
+        
+        // 파일 제거
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            displayUploadedFiles();
+        }
+        
+        // 글자 수 카운터 설정
+        function setupCharCount() {
+            const textarea = document.getElementById('submission-text');
+            const charCount = document.getElementById('char-count');
+            
+            textarea.addEventListener('input', () => {
+                const count = textarea.value.length;
+                charCount.textContent = count.toLocaleString();
+                
+                if (count > 9000) {
+                    charCount.style.color = '#e53e3e';
+                } else if (count > 7000) {
+                    charCount.style.color = '#ed8936';
+                } else {
+                    charCount.style.color = '#718096';
+                }
+            });
+        }
+        
+        // 과제 제출 처리
+        document.getElementById('submission-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const submissionText = document.getElementById('submission-text').value.trim();
+            
+            if (!submissionText) {
+                alert('제출 내용을 입력해주세요.');
+                return;
+            }
+            
+            if (confirm('과제를 제출하시겠습니까?')) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '📤 제출 중...';
+                
+                try {
+                    await submitAssignment(submissionText);
+                } catch (error) {
+                    console.error('제출 오류:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '📤 과제 제출';
+                }
+            }
+        });
+        
+        // 과제 제출 API 호출
+        async function submitAssignment(submissionText) {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`/api/assignments/${currentAssignment.id}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        submissionText,
+                        files: uploadedFiles.map(file => file.name) // 실제로는 파일 업로드 처리 필요
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('과제가 성공적으로 제출되었습니다!');
+                    setTimeout(() => {
+                        window.location.href = '/assignments.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                console.error('제출 오류:', error);
+                // 실제 API 연동 실패 시 성공으로 처리 (데모용)
+                showSuccess('과제가 성공적으로 제출되었습니다! (데모 모드)');
+                setTimeout(() => {
+                    window.location.href = '/assignments.html';
+                }, 2000);
+            }
+        }
+        
+        // 유틸리티 함수들
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

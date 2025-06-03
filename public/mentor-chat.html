@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 멘토와 대화 - PBT LMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mentor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+        
+        .message.user .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.assistant .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .message.user .message-avatar {
+            background: #007bff;
+            color: white;
+        }
+        
+        .message.assistant .message-avatar {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .message-time {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .form-control {
+            border-radius: 25px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 50px 12px 20px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .send-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .typing-indicator {
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            max-width: 70px;
+            display: none;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            color: #666;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .quick-action-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .mentor-info {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .mentor-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .rating-stars {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-mortarboard-fill"></i> PBT LMS
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard.html">대시보드</a>
+                <a class="nav-link" href="/mentors.html">AI 멘토</a>
+                <a class="nav-link" href="#" onclick="logout()">로그아웃</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 사이드바 - 멘토 정보 -->
+            <div class="col-lg-3">
+                <div id="mentorInfo" class="mentor-info">
+                    <!-- 멘토 정보가 여기에 로드됩니다 -->
+                </div>
+                
+                <!-- 대화 이력 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-clock-history"></i> 최근 대화</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="conversationHistory">
+                            <!-- 대화 이력이 여기에 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 메인 채팅 영역 -->
+            <div class="col-lg-9">
+                <div class="chat-container">
+                    <!-- 채팅 헤더 -->
+                    <div class="chat-header" id="chatHeader">
+                        <!-- 헤더 내용이 여기에 로드됩니다 -->
+                    </div>
+                    
+                    <!-- 채팅 메시지 영역 -->
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="text-center py-5" id="welcomeMessage">
+                            <i class="bi bi-robot" style="font-size: 3rem; color: #ccc;"></i>
+                            <h4 class="mt-3 text-muted">AI 멘토와 대화를 시작해보세요!</h4>
+                            <p class="text-muted">궁금한 것이 있으면 언제든지 물어보세요.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 채팅 입력 영역 -->
+                    <div class="chat-input">
+                        <!-- 빠른 질문 버튼들 -->
+                        <div class="quick-actions" id="quickActions">
+                            <div class="quick-action-btn" onclick="sendQuickMessage('안녕하세요! 처음 뵙겠습니다.')">
+                                <i class="bi bi-hand-thumbs-up"></i> 인사하기
+                            </div>
+                            <div class="quick-action-btn" onclick="sendQuickMessage('어떤 분야에 전문성을 가지고 계신가요?')">
+                                <i class="bi bi-question-circle"></i> 전문 분야 물어보기
+                            </div>
+                            <div class="quick-action-btn" onclick="sendQuickMessage('제가 학습하고 있는 내용에 대해 조언을 구하고 싶습니다.')">
+                                <i class="bi bi-lightbulb"></i> 조언 구하기
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="messageInput" 
+                                   placeholder="메시지를 입력하세요..." 
+                                   onkeypress="handleKeyPress(event)">
+                            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- 타이핑 인디케이터 -->
+                        <div class="message assistant mt-3" id="typingIndicator" style="display: none;">
+                            <div class="message-avatar">AI</div>
+                            <div class="typing-indicator">
+                                <div class="typing-dots">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentMentor = null;
+        let currentSession = null;
+        let isLoading = false;
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mentorId = urlParams.get('id'); // 'mentorId' 대신 'id' 사용
+            
+            if (mentorId) {
+                loadMentor(mentorId);
+            } else {
+                alert('멘토 ID가 필요합니다.');
+                window.location.href = '/mentors.html';
+            }
+        });
+
+        // 멘토 정보 로드
+        async function loadMentor(mentorId) {
+            try {
+                // 실제 API 호출 대신 데모 데이터 사용
+                // const token = localStorage.getItem('token');
+                // const response = await fetch(`/api/mentors/${mentorId}`, {
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // });
+                // const data = await response.json();
+                
+                // 데모 데이터 생성
+                const demoData = getMentorDemoData(mentorId);
+                
+                if (demoData) {
+                    currentMentor = demoData;
+                    renderMentorInfo();
+                    renderChatHeader();
+                    loadConversationHistory(mentorId);
+                    startNewConversation();
+                } else {
+                    throw new Error('멘토를 찾을 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('Error loading mentor:', error);
+                alert('멘토 정보를 불러오는 중 오류가 발생했습니다.');
+                window.location.href = '/mentors.html';
+            }
+        }
+        
+        // 데모 데이터 생성
+        function getMentorDemoData(id) {
+            const mentors = {
+                '1': {
+                    id: 1,
+                    name: '개발 멘토 Alex',
+                    expertise: '프로그래밍 • 소프트웨어 아키텍처',
+                    description: '풀스택 개발과 시스템 설계에 대한 전문 지식을 바탕으로 실무적인 조언을 제공합니다.',
+                    rating: 4.8,
+                    usageCount: 24,
+                    knowledgeCount: 15
+                },
+                '2': {
+                    id: 2,
+                    name: '디자인 전문가 Luna',
+                    expertise: 'UI/UX 디자인 • 브랜딩',
+                    description: '사용자 경험과 시각 디자인에 대한 깊이 있는 통찰을 제공하는 디자인 멘토입니다.',
+                    rating: 4.9,
+                    usageCount: 31,
+                    knowledgeCount: 8
+                },
+                '3': {
+                    id: 3,
+                    name: '데이터 사이언스 멘토',
+                    expertise: '머신러닝 • 데이터 분석',
+                    description: '데이터 분석과 머신러닝 모델링에 대한 전문적인 가이드를 제공합니다.',
+                    rating: 4.7,
+                    usageCount: 156,
+                    knowledgeCount: 22
+                }
+            };
+            
+            return mentors[id];
+        }
+
+        // 멘토 정보 렌더링
+        function renderMentorInfo() {
+            const mentorInfo = document.getElementById('mentorInfo');
+            mentorInfo.innerHTML = `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="mentor-avatar me-3" style="width: 60px; height: 60px; font-size: 24px; background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); color: white;">
+                        ${currentMentor.name.charAt(0)}
+                    </div>
+                    <div>
+                        <h5 class="mb-1">${currentMentor.name}</h5>
+                        ${currentMentor.expertise ? `<span class="badge bg-light text-dark">${currentMentor.expertise}</span>` : ''}
+                    </div>
+                </div>
+                
+                ${currentMentor.description ? `
+                    <p class="text-muted small">${currentMentor.description}</p>
+                ` : ''}
+                
+                <div class="mentor-stats">
+                    <span class="rating-stars">
+                        ${'★'.repeat(Math.floor(currentMentor.rating))}${'☆'.repeat(5 - Math.floor(currentMentor.rating))}
+                        <span class="text-muted">${currentMentor.rating.toFixed(1)}</span>
+                    </span>
+                    <span><i class="bi bi-chat-dots"></i> ${currentMentor.usageCount}회</span>
+                </div>
+                
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-book"></i> ${currentMentor.knowledgeCount || 0}개의 전문 지식
+                    </small>
+                </div>
+            `;
+        }
+
+        // 채팅 헤더 렌더링
+        function renderChatHeader() {
+            const chatHeader = document.getElementById('chatHeader');
+            chatHeader.innerHTML = `
+                <div class="mentor-avatar">${currentMentor.name.charAt(0)}</div>
+                <div class="flex-grow-1">
+                    <h5 class="mb-0">${currentMentor.name}</h5>
+                    <small class="opacity-75">
+                        <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;"></i> 온라인
+                    </small>
+                </div>
+                <button class="btn btn-outline-light btn-sm" onclick="endConversation()">
+                    <i class="bi bi-x-circle"></i> 대화 종료
+                </button>
+            `;
+        }
+
+        // 새 대화 시작
+        async function startNewConversation() {
+            try {
+                // 실제 API 호출 대신 데모 세션 생성
+                // const token = localStorage.getItem('token');
+                // const response = await fetch(`/api/mentors/${currentMentor.id}/chat/start`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`,
+                //         'Content-Type': 'application/json'
+                //     }
+                // });
+                // const data = await response.json();
+                
+                // 데모 세션 생성
+                currentSession = {
+                    sessionId: 'demo-session-' + Date.now(),
+                    mentorId: currentMentor.id,
+                    startedAt: new Date()
+                };
+                
+                document.getElementById('welcomeMessage').style.display = 'none';
+                
+                // 환영 메시지 추가
+                setTimeout(() => {
+                    addMessage('assistant', `안녕하세요! ${currentMentor.name}입니다. ${currentMentor.expertise} 분야에서 도움을 드릴 수 있습니다. 궁금한 것이 있으시면 언제든지 물어보세요!`);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error starting conversation:', error);
+                alert('대화를 시작하는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 메시지 전송
+        async function sendMessage(messageText = null) {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageText || messageInput.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            if (!currentSession) {
+                alert('대화 세션이 초기화되지 않았습니다.');
+                return;
+            }
+            
+            // 사용자 메시지 표시
+            addMessage('user', message);
+            messageInput.value = '';
+            
+            // 빠른 액션 숨기기
+            document.getElementById('quickActions').style.display = 'none';
+            
+            // 타이핑 인디케이터 표시
+            showTypingIndicator();
+            
+            // 전송 버튼 비활성화
+            setLoading(true);
+            
+            try {
+                // 실제 API 호출 대신 데모 응답 생성
+                // const token = localStorage.getItem('token');
+                // const response = await fetch(`/api/mentors/${currentMentor.id}/chat/message`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`,
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({
+                //         sessionId: currentSession.sessionId,
+                //         message: message
+                //     })
+                // });
+                // const data = await response.json();
+                
+                // 데모 응답 생성 (실제로는 AI API 호출)
+                const demoResponse = await generateDemoResponse(message, currentMentor);
+                
+                // 응답 지연 시뮬레이션
+                setTimeout(() => {
+                    // 타이핑 인디케이터 숨기기
+                    hideTypingIndicator();
+                    
+                    // AI 응답 표시
+                    addMessage('assistant', demoResponse);
+                    setLoading(false);
+                }, 1000 + Math.random() * 2000); // 1-3초 랜덤 지연
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                hideTypingIndicator();
+                addMessage('assistant', '죄송합니다. 메시지 전송 중 오류가 발생했습니다. 다시 시도해주세요.');
+                setLoading(false);
+            }
+        }
+        
+        // 데모 응답 생성
+        async function generateDemoResponse(userMessage, mentor) {
+            // 간단한 키워드 기반 응답 시스템
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('안녕') || message.includes('처음')) {
+                return `안녕하세요! ${mentor.name}입니다. 만나서 반갑습니다. ${mentor.expertise} 분야에서 여러분을 도와드릴 수 있어서 기쁩니다.`;
+            }
+            
+            if (message.includes('전문') || message.includes('분야')) {
+                return `저의 전문 분야는 ${mentor.expertise}입니다. ${mentor.description} 구체적으로 어떤 부분에 대해 궁금하신가요?`;
+            }
+            
+            if (message.includes('조언') || message.includes('도움')) {
+                return `물론입니다! 제가 도와드릴 수 있는 부분이 많습니다. 구체적으로 어떤 상황이나 문제에 대해 조언을 구하고 계신가요? 자세히 말씀해 주시면 더 정확한 도움을 드릴 수 있습니다.`;
+            }
+            
+            if (message.includes('학습') || message.includes('공부')) {
+                return `학습에 대한 질문이시군요! ${mentor.expertise} 분야에서 효과적인 학습 방법은 다음과 같습니다:\n\n1. 기초부터 체계적으로 접근하기\n2. 실습과 이론의 균형 맞추기\n3. 꾸준한 연습과 복습\n\n어떤 부분을 중점적으로 학습하고 계신지 알려주시면 더 구체적인 조언을 드릴 수 있습니다.`;
+            }
+            
+            if (message.includes('프로그래밍') || message.includes('코딩') || message.includes('개발')) {
+                return `프로그래밍에 대한 질문이시군요! 개발자로서 성장하기 위해서는:\n\n• 문제 해결 능력 기르기\n• 다양한 프로젝트 경험하기\n• 코드 리뷰와 팀 협업 경험\n• 최신 기술 트렌드 파악하기\n\n구체적으로 어떤 언어나 기술에 대해 궁금하신가요?`;
+            }
+            
+            if (message.includes('디자인') || message.includes('UI') || message.includes('UX')) {
+                return `디자인에 대한 좋은 질문입니다! UI/UX 디자인에서 중요한 것은:\n\n• 사용자 중심적 사고\n• 일관성 있는 디자인 시스템\n• 접근성과 사용성 고려\n• 지속적인 사용자 피드백 수집\n\n어떤 디자인 프로젝트를 진행하고 계신지 알려주시면 더 구체적인 조언을 드릴게요!`;
+            }
+            
+            if (message.includes('데이터') || message.includes('분석') || message.includes('머신러닝')) {
+                return `데이터 분야에 대한 질문이네요! 데이터 사이언스에서 중요한 요소들:\n\n• 올바른 데이터 수집과 전처리\n• 적절한 분석 방법 선택\n• 결과 해석과 시각화\n• 비즈니스 문제 해결에 적용\n\n현재 어떤 데이터 프로젝트나 분석을 진행하고 계신가요?`;
+            }
+            
+            // 일반적인 응답
+            const generalResponses = [
+                `흥미로운 질문이네요! ${mentor.name}로서 이런 관점에서 생각해볼 수 있습니다. 좀 더 구체적인 상황이나 맥락을 알려주시면 더 정확한 답변을 드릴 수 있을 것 같습니다.`,
+                `좋은 질문입니다! ${mentor.expertise} 분야의 경험을 바탕으로 말씀드리면, 이런 상황에서는 여러 가지 접근 방법이 있습니다. 어떤 부분에 특히 관심이 있으신가요?`,
+                `네, 그런 부분에 대해 궁금해하시는군요. 제 경험상 이런 경우에는... 더 자세한 내용을 알려주시면 보다 구체적인 조언을 드릴 수 있을 것 같습니다.`,
+                `이해합니다. ${mentor.name}의 관점에서 이런 상황을 많이 봐왔는데요, 우선 몇 가지 확인해볼 점들이 있습니다. 현재 상황을 좀 더 자세히 설명해 주실 수 있나요?`
+            ];
+            
+            return generalResponses[Math.floor(Math.random() * generalResponses.length)];
+        }
+
+        // 빠른 메시지 전송
+        function sendQuickMessage(message) {
+            sendMessage(message);
+        }
+
+        // 메시지 추가
+        function addMessage(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${role}`;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            
+            messageEl.innerHTML = `
+                <div class="message-avatar">
+                    ${role === 'user' ? '나' : currentMentor.name.charAt(0)}
+                </div>
+                <div>
+                    <div class="message-content">${content}</div>
+                    <div class="message-time">${timeStr}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 타이핑 인디케이터 표시/숨기기
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        // 로딩 상태 설정
+        function setLoading(loading) {
+            isLoading = loading;
+            const sendBtn = document.getElementById('sendBtn');
+            const messageInput = document.getElementById('messageInput');
+            
+            sendBtn.disabled = loading;
+            messageInput.disabled = loading;
+            
+            if (loading) {
+                sendBtn.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+            } else {
+                sendBtn.innerHTML = '<i class="bi bi-send-fill"></i>';
+            }
+        }
+
+        // 키보드 이벤트 처리
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // 대화 이력 로드
+        async function loadConversationHistory(mentorId) {
+            try {
+                // 실제 API 호출 대신 데모 데이터 사용
+                // const token = localStorage.getItem('token');
+                // const response = await fetch(`/api/mentors/${mentorId}/conversations?limit=5`, {
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // });
+                // const data = await response.json();
+                
+                // 데모 대화 이력 생성
+                const demoConversations = [
+                    {
+                        sessionId: 'demo-1',
+                        title: '프로그래밍 학습 방법',
+                        lastMessageAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+                        messageCount: 15
+                    },
+                    {
+                        sessionId: 'demo-2', 
+                        title: '커리어 전환 조언',
+                        lastMessageAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+                        messageCount: 8
+                    },
+                    {
+                        sessionId: 'demo-3',
+                        title: '프로젝트 구조 설계',
+                        lastMessageAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                        messageCount: 22
+                    }
+                ];
+                
+                renderConversationHistory(demoConversations);
+                
+            } catch (error) {
+                console.error('Error loading conversation history:', error);
+                renderConversationHistory([]);
+            }
+        }
+
+        // 대화 이력 렌더링
+        function renderConversationHistory(conversations) {
+            const historyEl = document.getElementById('conversationHistory');
+            
+            if (conversations.length === 0) {
+                historyEl.innerHTML = '<p class="text-muted small">이전 대화가 없습니다.</p>';
+                return;
+            }
+            
+            const historyHTML = conversations.map(conv => `
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <div class="flex-grow-1" style="cursor: pointer;" onclick="loadConversation('${conv.sessionId}')">
+                        <div class="small fw-bold">${conv.title || '제목 없음'}</div>
+                        <div class="text-muted" style="font-size: 0.8em;">
+                            ${new Date(conv.lastMessageAt).toLocaleDateString('ko-KR')}
+                        </div>
+                    </div>
+                    <small class="text-muted">${conv.messageCount}개</small>
+                </div>
+            `).join('');
+            
+            historyEl.innerHTML = historyHTML;
+        }
+
+        // 이전 대화 로드
+        async function loadConversation(sessionId) {
+            // 구현 예정: 이전 대화 불러오기
+            alert('이전 대화 불러오기 기능은 곧 추가될 예정입니다.');
+        }
+
+        // 대화 종료
+        function endConversation() {
+            if (confirm('대화를 종료하시겠습니까?')) {
+                window.location.href = '/mentors.html';
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('authToken'); // 'token' 대신 'authToken' 사용
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

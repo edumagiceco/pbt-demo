@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 목록 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .assignment-filters {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select {
+            padding: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #4a5568;
+        }
+        
+        .assignment-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-pending { color: #ed8936; }
+        .stat-submitted { color: #38b2ac; }
+        .stat-graded { color: #48bb78; }
+        .stat-overdue { color: #e53e3e; }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .assignment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .assignment-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .assignment-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .assignment-title {
+            color: #4a5568;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .assignment-course {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .assignment-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .status-pending {
+            background: #fed7c3;
+            color: #c05621;
+        }
+        
+        .status-submitted {
+            background: #b2f5ea;
+            color: #234e52;
+        }
+        
+        .status-graded {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .status-overdue {
+            background: #fed7e2;
+            color: #9b2c2c;
+        }
+        
+        .assignment-description {
+            color: #718096;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .assignment-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+        }
+        
+        .meta-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .meta-value {
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .due-date-warning {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+        
+        .assignment-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .score-good {
+            color: #48bb78;
+        }
+        
+        .score-average {
+            color: #ed8936;
+        }
+        
+        .score-poor {
+            color: #e53e3e;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .assignment-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .assignment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .assignment-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .assignment-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/progress.html" class="nav-link">학습 진도</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <a href="/assignments.html" class="nav-link" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">과제</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>📝 과제 목록</h1>
+            <p>과제를 제출하고 피드백을 받아보세요</p>
+        </div>
+        
+        <div class="assignment-stats">
+            <div class="stat-card">
+                <div class="stat-number stat-pending" id="pendingCount">0</div>
+                <div class="stat-label">대기 중</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-submitted" id="submittedCount">0</div>
+                <div class="stat-label">제출됨</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-graded" id="gradedCount">0</div>
+                <div class="stat-label">채점됨</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-overdue" id="overdueCount">0</div>
+                <div class="stat-label">마감 지남</div>
+            </div>
+        </div>
+        
+        <div class="assignment-filters">
+            <div class="filter-group">
+                <label for="statusFilter">상태</label>
+                <select id="statusFilter" onchange="filterAssignments()">
+                    <option value="">전체</option>
+                    <option value="pending">대기 중</option>
+                    <option value="submitted">제출됨</option>
+                    <option value="graded">채점됨</option>
+                    <option value="overdue">마감 지남</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="courseFilter">과정</label>
+                <select id="courseFilter" onchange="filterAssignments()">
+                    <option value="">전체</option>
+                    <option value="javascript">JavaScript 기초</option>
+                    <option value="algorithm">알고리즘과 자료구조</option>
+                    <option value="react">React 웹 개발</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="typeFilter">유형</label>
+                <select id="typeFilter" onchange="filterAssignments()">
+                    <option value="">전체</option>
+                    <option value="code">코드 과제</option>
+                    <option value="essay">에세이</option>
+                    <option value="project">프로젝트</option>
+                    <option value="quiz">퀴즈</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>과제 목록을 불러오는 중...</p>
+        </div>
+        
+        <div id="assignment-list" class="assignment-list" style="display: none;">
+            <!-- 과제 목록이 여기에 동적으로 추가됩니다 -->
+        </div>
+        
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h3>📚 아직 과제가 없습니다</h3>
+            <p>과정에 참여하면 과제가 표시됩니다.</p>
+            <a href="/courses.html" class="btn btn-primary">과정 보기</a>
+        </div>
+    </div>
+
+    <script>
+        let allAssignments = [];
+        
+        // 페이지 로드 시 과제 목록 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            await loadAssignments();
+        });
+        
+        // 과제 목록 로드
+        async function loadAssignments() {
+            const loading = document.getElementById('loading');
+            const assignmentList = document.getElementById('assignment-list');
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                // 실제 API 호출 시뮬레이션
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                loading.style.display = 'none';
+                assignmentList.style.display = 'block';
+                loadSampleAssignments();
+                
+            } catch (error) {
+                console.error('과제 로드 오류:', error);
+                loading.style.display = 'none';
+                assignmentList.style.display = 'block';
+                loadSampleAssignments();
+            }
+        }
+        
+        // 샘플 과제 데이터 로드
+        function loadSampleAssignments() {
+            allAssignments = [
+                {
+                    id: 1,
+                    title: 'JavaScript 함수와 스코프',
+                    description: '함수의 호이스팅과 클로저 개념을 이해하고 실습 문제를 해결하세요.',
+                    course: 'JavaScript 기초',
+                    type: 'code',
+                    status: 'pending',
+                    dueDate: '2025-05-28T23:59:59Z',
+                    maxScore: 100,
+                    submittedAt: null,
+                    score: null,
+                    feedback: null,
+                    attempts: 0,
+                    maxAttempts: 3
+                },
+                {
+                    id: 2,
+                    title: '정렬 알고리즘 구현',
+                    description: '퀵 정렬과 머지 정렬을 구현하고 성능을 비교 분석하세요.',
+                    course: '알고리즘과 자료구조',
+                    type: 'code',
+                    status: 'submitted',
+                    dueDate: '2025-05-26T23:59:59Z',
+                    maxScore: 150,
+                    submittedAt: '2025-05-25T14:30:00Z',
+                    score: null,
+                    feedback: null,
+                    attempts: 1,
+                    maxAttempts: 2
+                },
+                {
+                    id: 3,
+                    title: 'React 컴포넌트 설계',
+                    description: '재사용 가능한 React 컴포넌트를 설계하고 구현하세요.',
+                    course: 'React 웹 개발',
+                    type: 'project',
+                    status: 'graded',
+                    dueDate: '2025-05-20T23:59:59Z',
+                    maxScore: 200,
+                    submittedAt: '2025-05-19T16:45:00Z',
+                    score: 175,
+                    feedback: '전반적으로 잘 구현되었습니다. 컴포넌트 재사용성이 우수합니다.',
+                    attempts: 1,
+                    maxAttempts: 1
+                },
+                {
+                    id: 4,
+                    title: '웹 개발 트렌드 분석',
+                    description: '2025년 웹 개발 트렌드를 조사하고 분석 보고서를 작성하세요.',
+                    course: 'React 웹 개발',
+                    type: 'essay',
+                    status: 'overdue',
+                    dueDate: '2025-05-22T23:59:59Z',
+                    maxScore: 100,
+                    submittedAt: null,
+                    score: null,
+                    feedback: null,
+                    attempts: 0,
+                    maxAttempts: 1
+                },
+                {
+                    id: 5,
+                    title: '자료구조 퀴즈',
+                    description: '스택, 큐, 트리의 기본 개념과 구현에 대한 퀴즈입니다.',
+                    course: '알고리즘과 자료구조',
+                    type: 'quiz',
+                    status: 'graded',
+                    dueDate: '2025-05-15T23:59:59Z',
+                    maxScore: 50,
+                    submittedAt: '2025-05-14T10:20:00Z',
+                    score: 42,
+                    feedback: '대부분 정답입니다. 트리 순회 부분을 다시 복습해보세요.',
+                    attempts: 1,
+                    maxAttempts: 1
+                }
+            ];
+            
+            renderAssignments(allAssignments);
+            updateStats();
+        }
+        
+        // 과제 목록 렌더링
+        function renderAssignments(assignments) {
+            const assignmentList = document.getElementById('assignment-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (assignments.length === 0) {
+                assignmentList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            assignmentList.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            assignmentList.innerHTML = assignments.map(assignment => {
+                const statusText = {
+                    'pending': '대기 중',
+                    'submitted': '제출됨',
+                    'graded': '채점됨',
+                    'overdue': '마감 지남'
+                }[assignment.status];
+                
+                const typeText = {
+                    'code': '코드 과제',
+                    'essay': '에세이',
+                    'project': '프로젝트',
+                    'quiz': '퀴즈'
+                }[assignment.type];
+                
+                const dueDate = new Date(assignment.dueDate);
+                const now = new Date();
+                const isOverdue = now > dueDate && assignment.status === 'pending';
+                const timeUntilDue = getTimeUntilDue(dueDate);
+                
+                let scoreDisplay = '';
+                if (assignment.score !== null) {
+                    const percentage = (assignment.score / assignment.maxScore) * 100;
+                    const scoreClass = percentage >= 80 ? 'score-good' : 
+                                     percentage >= 60 ? 'score-average' : 'score-poor';
+                    scoreDisplay = `
+                        <div class="score-display ${scoreClass}">
+                            ⭐ ${assignment.score}/${assignment.maxScore} (${Math.round(percentage)}%)
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="assignment-card" onclick="openAssignment(${assignment.id})">
+                        <div class="assignment-header">
+                            <div>
+                                <div class="assignment-title">${assignment.title}</div>
+                                <div class="assignment-course">${assignment.course}</div>
+                            </div>
+                            <div class="assignment-status status-${assignment.status}">
+                                ${getStatusIcon(assignment.status)} ${statusText}
+                            </div>
+                        </div>
+                        
+                        <div class="assignment-description">
+                            ${assignment.description}
+                        </div>
+                        
+                        <div class="assignment-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">유형</span>
+                                <span class="meta-value">${typeText}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">마감일</span>
+                                <span class="meta-value ${isOverdue ? 'due-date-warning' : ''}">
+                                    ${timeUntilDue}
+                                </span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">최대 점수</span>
+                                <span class="meta-value">${assignment.maxScore}점</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">제출 횟수</span>
+                                <span class="meta-value">${assignment.attempts}/${assignment.maxAttempts}</span>
+                            </div>
+                        </div>
+                        
+                        ${scoreDisplay}
+                        
+                        ${assignment.feedback ? `
+                            <div style="margin: 1rem 0; padding: 1rem; background: rgba(72, 187, 120, 0.1); border-radius: 8px; color: #276749;">
+                                <strong>피드백:</strong> ${assignment.feedback}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="assignment-actions">
+                            ${getActionButtons(assignment)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 상태별 아이콘
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': '⏳',
+                'submitted': '📤',
+                'graded': '✅',
+                'overdue': '⚠️'
+            };
+            return icons[status] || '📝';
+        }
+        
+        // 마감일까지 시간 계산
+        function getTimeUntilDue(dueDate) {
+            const now = new Date();
+            const diffMs = dueDate - now;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            if (diffMs < 0) {
+                const overdueDays = Math.abs(diffDays);
+                return `${overdueDays}일 지남`;
+            } else if (diffDays > 0) {
+                return `${diffDays}일 ${diffHours}시간 남음`;
+            } else if (diffHours > 0) {
+                return `${diffHours}시간 남음`;
+            } else {
+                return '마감 임박';
+            }
+        }
+        
+        // 액션 버튼 생성
+        function getActionButtons(assignment) {
+            switch (assignment.status) {
+                case 'pending':
+                    if (assignment.attempts < assignment.maxAttempts) {
+                        return `<a href="/assignment-submit.html?id=${assignment.id}" class="btn btn-primary">과제 제출</a>`;
+                    } else {
+                        return `<span style="color: #718096;">제출 횟수 초과</span>`;
+                    }
+                case 'submitted':
+                    return `
+                        <a href="/assignment-detail.html?id=${assignment.id}" class="btn btn-secondary">제출 내역 보기</a>
+                        ${assignment.attempts < assignment.maxAttempts ? 
+                            `<a href="/assignment-submit.html?id=${assignment.id}" class="btn btn-primary">재제출</a>` : 
+                            ''}
+                    `;
+                case 'graded':
+                    return `
+                        <a href="/assignment-detail.html?id=${assignment.id}" class="btn btn-success">결과 보기</a>
+                        <a href="/assignment-feedback.html?id=${assignment.id}" class="btn btn-secondary">피드백 보기</a>
+                    `;
+                case 'overdue':
+                    return `<span style="color: #e53e3e;">마감일이 지났습니다</span>`;
+                default:
+                    return '';
+            }
+        }
+        
+        // 통계 업데이트
+        function updateStats() {
+            const stats = {
+                pending: 0,
+                submitted: 0,
+                graded: 0,
+                overdue: 0
+            };
+            
+            allAssignments.forEach(assignment => {
+                stats[assignment.status]++;
+            });
+            
+            document.getElementById('pendingCount').textContent = stats.pending;
+            document.getElementById('submittedCount').textContent = stats.submitted;
+            document.getElementById('gradedCount').textContent = stats.graded;
+            document.getElementById('overdueCount').textContent = stats.overdue;
+        }
+        
+        // 과제 필터링
+        function filterAssignments() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const courseFilter = document.getElementById('courseFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            let filteredAssignments = allAssignments;
+            
+            if (statusFilter) {
+                filteredAssignments = filteredAssignments.filter(a => a.status === statusFilter);
+            }
+            
+            if (courseFilter) {
+                filteredAssignments = filteredAssignments.filter(a => 
+                    a.course.toLowerCase().includes(courseFilter.toLowerCase()));
+            }
+            
+            if (typeFilter) {
+                filteredAssignments = filteredAssignments.filter(a => a.type === typeFilter);
+            }
+            
+            renderAssignments(filteredAssignments);
+        }
+        
+        // 과제 상세 보기
+        function openAssignment(assignmentId) {
+            window.location.href = `/assignment-detail.html?id=${assignmentId}`;
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 멘토 생성 - AI 인재 커리어 플랫폼 PBT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-links a:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .page-header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .knowledge-section {
+            border: 2px dashed #e2e8f0;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .knowledge-type-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            background: #f7fafc;
+            padding: 0.3rem;
+        }
+        
+        .knowledge-tab {
+            flex: 1;
+            padding: 0.75rem;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .knowledge-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .knowledge-content {
+            display: none;
+        }
+        
+        .knowledge-content.active {
+            display: block;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 1rem auto;
+            font-weight: bold;
+        }
+        
+        .knowledge-item {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .knowledge-item .info {
+            flex-grow: 1;
+        }
+        
+        .knowledge-item .remove-btn {
+            background: #fed7e2;
+            color: #9b2c2c;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .knowledge-type-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="/assets/images/pbt-logo.png" alt="PBT Logo">
+            <span>AI 인재 커리어 플랫폼 PBT</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard.html">대시보드</a>
+            <a href="/mentors.html">AI 멘토</a>
+            <a href="/profile.html">프로필</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>🤖 새 AI 멘토 생성</h1>
+            <p>나만의 전문 AI 멘토를 만들어보세요</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="mentorForm">
+                <!-- 기본 정보 섹션 -->
+                <div class="form-group">
+                    <label for="mentorName">멘토 이름 *</label>
+                    <input type="text" id="mentorName" name="name" required 
+                           placeholder="예: 개발 멘토 Alex" maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="expertise">전문 분야</label>
+                    <input type="text" id="expertise" name="expertise" 
+                           placeholder="예: 프로그래밍, 데이터 분석, 디자인" maxlength="200">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">멘토 설명</label>
+                    <textarea id="description" name="description" 
+                              placeholder="이 멘토의 특징과 어떤 도움을 줄 수 있는지 설명해주세요..." 
+                              maxlength="500"></textarea>
+                </div>
+                
+                <!-- 아바타 미리보기 -->
+                <div class="form-group">
+                    <label>멘토 아바타</label>
+                    <div class="avatar-preview" id="avatarPreview">🤖</div>
+                </div>
+                
+                <!-- 성격 설정 -->
+                <div class="form-group">
+                    <label for="personality">멘토 성격</label>
+                    <select id="personality" name="personality">
+                        <option value="friendly">친근하고 따뜻한</option>
+                        <option value="professional">전문적이고 체계적인</option>
+                        <option value="casual">편안하고 자유로운</option>
+                        <option value="encouraging">격려하고 동기부여하는</option>
+                        <option value="analytical">분석적이고 논리적인</option>
+                    </select>
+                </div>
+                
+                <!-- 공개 설정 -->
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isPublic" name="isPublic">
+                        <label for="isPublic">다른 사용자와 공유 (공개 멘토로 설정)</label>
+                    </div>
+                </div>
+                
+                <!-- 지식 추가 섹션 -->
+                <div class="knowledge-section">
+                    <h3>📚 멘토에게 지식 추가하기</h3>
+                    <p>멘토가 전문적인 조언을 할 수 있도록 배경 지식을 추가해주세요.</p>
+                    
+                    <div class="knowledge-type-tabs">
+                        <button type="button" class="knowledge-tab active" data-type="text">
+                            📝 직접 입력
+                        </button>
+                        <button type="button" class="knowledge-tab" data-type="pdf">
+                            📄 PDF 업로드
+                        </button>
+                        <button type="button" class="knowledge-tab" data-type="youtube">
+                            🎥 유튜브 링크
+                        </button>
+                        <button type="button" class="knowledge-tab" data-type="website">
+                            🌐 웹사이트 링크
+                        </button>
+                    </div>
+                    
+                    <!-- 직접 입력 -->
+                    <div class="knowledge-content active" id="text-content">
+                        <div class="form-group">
+                            <label for="knowledgeTitle">지식 제목</label>
+                            <input type="text" id="knowledgeTitle" placeholder="예: JavaScript 기초 개념">
+                        </div>
+                        <div class="form-group">
+                            <label for="knowledgeText">지식 내용</label>
+                            <textarea id="knowledgeText" placeholder="멘토가 알아야 할 지식이나 정보를 입력하세요..." 
+                                      rows="8"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addTextKnowledge()">
+                            추가하기
+                        </button>
+                    </div>
+                    
+                    <!-- PDF 업로드 -->
+                    <div class="knowledge-content" id="pdf-content">
+                        <div class="file-upload-area" id="pdfUploadArea">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">📄</div>
+                            <p>PDF 파일을 드래그하거나 클릭하여 업로드하세요</p>
+                            <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;">
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('pdfFileInput').click()">
+                                파일 선택
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 유튜브 링크 -->
+                    <div class="knowledge-content" id="youtube-content">
+                        <div class="form-group">
+                            <label for="youtubeUrl">유튜브 URL</label>
+                            <input type="url" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addYoutubeKnowledge()">
+                            추가하기
+                        </button>
+                    </div>
+                    
+                    <!-- 웹사이트 링크 -->
+                    <div class="knowledge-content" id="website-content">
+                        <div class="form-group">
+                            <label for="websiteUrl">웹사이트 URL</label>
+                            <input type="url" id="websiteUrl" placeholder="https://example.com">
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addWebsiteKnowledge()">
+                            추가하기
+                        </button>
+                    </div>
+                    
+                    <!-- 추가된 지식 목록 -->
+                    <div id="knowledgeList" style="margin-top: 2rem;">
+                        <!-- 추가된 지식들이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/mentors.html" class="btn btn-secondary">취소</a>
+                    <button type="submit" class="btn btn-primary" id="createBtn">
+                        멘토 생성하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let knowledgeData = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // 탭 전환 기능
+            document.querySelectorAll('.knowledge-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const type = tab.dataset.type;
+                    switchKnowledgeTab(type);
+                });
+            });
+            
+            // 폼 제출 처리
+            document.getElementById('mentorForm').addEventListener('submit', handleFormSubmit);
+            
+            // 이름 변경 시 아바타 업데이트
+            document.getElementById('mentorName').addEventListener('input', updateAvatar);
+            
+            // PDF 드래그 앤 드롭
+            setupPdfDragDrop();
+        });
+        
+        // 탭 전환
+        function switchKnowledgeTab(type) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.knowledge-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.knowledge-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 선택된 탭 활성화
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+            document.getElementById(`${type}-content`).classList.add('active');
+        }
+        
+        // 아바타 업데이트
+        function updateAvatar() {
+            const name = document.getElementById('mentorName').value;
+            const avatar = document.getElementById('avatarPreview');
+            avatar.textContent = name ? name.charAt(0).toUpperCase() : '🤖';
+        }
+        
+        // 텍스트 지식 추가
+        function addTextKnowledge() {
+            const title = document.getElementById('knowledgeTitle').value.trim();
+            const content = document.getElementById('knowledgeText').value.trim();
+            
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+            
+            const knowledge = {
+                type: 'text',
+                title: title,
+                content: content,
+                wordCount: content.split(' ').length
+            };
+            
+            knowledgeData.push(knowledge);
+            renderKnowledgeList();
+            
+            // 입력 필드 초기화
+            document.getElementById('knowledgeTitle').value = '';
+            document.getElementById('knowledgeText').value = '';
+        }
+        
+        // 유튜브 지식 추가
+        function addYoutubeKnowledge() {
+            const url = document.getElementById('youtubeUrl').value.trim();
+            
+            if (!url) {
+                alert('유튜브 URL을 입력해주세요.');
+                return;
+            }
+            
+            if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+                alert('올바른 유튜브 URL을 입력해주세요.');
+                return;
+            }
+            
+            const knowledge = {
+                type: 'youtube',
+                title: '유튜브 영상',
+                url: url,
+                status: 'processing'
+            };
+            
+            knowledgeData.push(knowledge);
+            renderKnowledgeList();
+            
+            // 입력 필드 초기화
+            document.getElementById('youtubeUrl').value = '';
+            
+            // 실제로는 여기서 백엔드 API 호출하여 트랜스크립트 추출
+            setTimeout(() => {
+                knowledge.status = 'completed';
+                knowledge.wordCount = Math.floor(Math.random() * 1000) + 500;
+                renderKnowledgeList();
+            }, 2000);
+        }
+        
+        // 웹사이트 지식 추가
+        function addWebsiteKnowledge() {
+            const url = document.getElementById('websiteUrl').value.trim();
+            
+            if (!url) {
+                alert('웹사이트 URL을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                new URL(url);
+            } catch {
+                alert('올바른 URL을 입력해주세요.');
+                return;
+            }
+            
+            const knowledge = {
+                type: 'website',
+                title: '웹사이트 내용',
+                url: url,
+                status: 'processing'
+            };
+            
+            knowledgeData.push(knowledge);
+            renderKnowledgeList();
+            
+            // 입력 필드 초기화
+            document.getElementById('websiteUrl').value = '';
+            
+            // 실제로는 여기서 백엔드 API 호출하여 웹 스크래핑
+            setTimeout(() => {
+                knowledge.status = 'completed';
+                knowledge.wordCount = Math.floor(Math.random() * 2000) + 800;
+                renderKnowledgeList();
+            }, 3000);
+        }
+        
+        // PDF 드래그 앤 드롭 설정
+        function setupPdfDragDrop() {
+            const uploadArea = document.getElementById('pdfUploadArea');
+            const fileInput = document.getElementById('pdfFileInput');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/pdf') {
+                    handlePdfFile(files[0]);
+                } else {
+                    alert('PDF 파일만 업로드 가능합니다.');
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handlePdfFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        // PDF 파일 처리
+        function handlePdfFile(file) {
+            if (file.size > 10 * 1024 * 1024) { // 10MB 제한
+                alert('파일 크기는 10MB 이하만 가능합니다.');
+                return;
+            }
+            
+            const knowledge = {
+                type: 'pdf',
+                title: file.name,
+                file: file,
+                fileSize: file.size,
+                status: 'processing'
+            };
+            
+            knowledgeData.push(knowledge);
+            renderKnowledgeList();
+            
+            // 실제로는 여기서 백엔드 API 호출하여 PDF 텍스트 추출
+            setTimeout(() => {
+                knowledge.status = 'completed';
+                knowledge.wordCount = Math.floor(Math.random() * 5000) + 1000;
+                renderKnowledgeList();
+            }, 4000);
+        }
+        
+        // 지식 목록 렌더링
+        function renderKnowledgeList() {
+            const listEl = document.getElementById('knowledgeList');
+            
+            if (knowledgeData.length === 0) {
+                listEl.innerHTML = '';
+                return;
+            }
+            
+            const html = knowledgeData.map((knowledge, index) => {
+                const typeIcon = {
+                    text: '📝',
+                    pdf: '📄',
+                    youtube: '🎥',
+                    website: '🌐'
+                };
+                
+                const statusText = {
+                    processing: '처리 중...',
+                    completed: '완료',
+                    failed: '실패'
+                };
+                
+                return `
+                    <div class="knowledge-item">
+                        <div class="info">
+                            <div style="font-weight: 600;">
+                                ${typeIcon[knowledge.type]} ${knowledge.title}
+                            </div>
+                            <div style="font-size: 0.9em; color: #718096;">
+                                ${knowledge.type === 'text' ? 
+                                    `${knowledge.wordCount}단어` : 
+                                    `${statusText[knowledge.status]}${knowledge.wordCount ? ` • ${knowledge.wordCount}단어` : ''}`
+                                }
+                                ${knowledge.fileSize ? ` • ${(knowledge.fileSize / 1024 / 1024).toFixed(1)}MB` : ''}
+                            </div>
+                            ${knowledge.status === 'processing' ? `
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${Math.random() * 80 + 10}%;"></div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <button type="button" class="remove-btn" onclick="removeKnowledge(${index})">
+                            삭제
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            listEl.innerHTML = html;
+        }
+        
+        // 지식 삭제
+        function removeKnowledge(index) {
+            knowledgeData.splice(index, 1);
+            renderKnowledgeList();
+        }
+        
+        // 폼 제출 처리
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const mentorData = {
+                name: formData.get('name'),
+                expertise: formData.get('expertise'),
+                description: formData.get('description'),
+                personality: formData.get('personality'),
+                isPublic: formData.has('isPublic'),
+                knowledge: knowledgeData
+            };
+            
+            // 기본 유효성 검사
+            if (!mentorData.name.trim()) {
+                alert('멘토 이름을 입력해주세요.');
+                return;
+            }
+            
+            const createBtn = document.getElementById('createBtn');
+            const originalText = createBtn.textContent;
+            
+            try {
+                createBtn.disabled = true;
+                createBtn.textContent = '생성 중...';
+                
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/mentors', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(mentorData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('AI 멘토가 성공적으로 생성되었습니다!');
+                    window.location.href = '/mentors.html';
+                } else {
+                    throw new Error(result.message || '멘토 생성에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error creating mentor:', error);
+                alert('멘토 생성 중 오류가 발생했습니다: ' + error.message);
+            } finally {
+                createBtn.disabled = false;
+                createBtn.textContent = originalText;
+            }
+        }
+    </script>
+    
+    <!-- PBT LMS 챗봇 -->
+    <script src="/js/chatbot.js"></script>
+</body>
+</html>

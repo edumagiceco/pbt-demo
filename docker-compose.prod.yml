@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+
+
+
+
+volumes:
+  mysql_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/lib/pbt-lms/mysql
+  redis_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/lib/pbt-lms/redis
+  nginx_cache:
+    driver: local
+
+networks:
+  pbt-network-prod:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: pbt-prod-br0

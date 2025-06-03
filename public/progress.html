@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 진도 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .progress-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .progress-card h3 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+        
+        .progress-circle svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 8;
+        }
+        
+        .progress-bg {
+            stroke: #e2e8f0;
+        }
+        
+        .progress-fill {
+            stroke: #667eea;
+            stroke-linecap: round;
+            transition: stroke-dasharray 1s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .progress-detail {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-detail h3 {
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .course-progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .course-progress-item:last-child {
+            border-bottom: none;
+        }
+        
+        .course-info {
+            flex: 1;
+        }
+        
+        .course-title {
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .course-meta {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .course-progress {
+            min-width: 200px;
+            margin-left: 1rem;
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.8s ease;
+        }
+        
+        .progress-percentage {
+            text-align: right;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .achievements {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .achievement-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .achievement-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .achievement-title {
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .achievement-desc {
+            color: #718096;
+            font-size: 0.8rem;
+        }
+        
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .activity-time {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .course-progress-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .course-progress {
+                min-width: auto;
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/progress.html" class="nav-link" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">학습 진도</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>📊 학습 진도</h1>
+            <p>내 학습 현황과 진도를 상세히 확인하세요</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>진도 정보를 불러오는 중...</p>
+        </div>
+        
+        <div id="progress-content" style="display: none;">
+            <div class="progress-overview">
+                <div class="progress-card">
+                    <h3>전체 진도율</h3>
+                    <div class="progress-circle">
+                        <svg>
+                            <circle class="progress-bg" cx="60" cy="60" r="52"></circle>
+                            <circle class="progress-fill" cx="60" cy="60" r="52" 
+                                    stroke-dasharray="0 327" id="overall-progress"></circle>
+                        </svg>
+                        <div class="progress-text" id="overall-percentage">0%</div>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <h3>해결한 문제</h3>
+                    <div class="progress-circle">
+                        <svg>
+                            <circle class="progress-bg" cx="60" cy="60" r="52"></circle>
+                            <circle class="progress-fill" cx="60" cy="60" r="52" 
+                                    stroke-dasharray="0 327" id="problems-progress"></circle>
+                        </svg>
+                        <div class="progress-text" id="problems-count">0</div>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <h3>완료한 과정</h3>
+                    <div class="progress-circle">
+                        <svg>
+                            <circle class="progress-bg" cx="60" cy="60" r="52"></circle>
+                            <circle class="progress-fill" cx="60" cy="60" r="52" 
+                                    stroke-dasharray="0 327" id="courses-progress"></circle>
+                        </svg>
+                        <div class="progress-text" id="courses-count">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-detail">
+                <h3>과정별 진도</h3>
+                <div id="course-progress-list">
+                    <!-- 과정별 진도가 여기에 표시됩니다 -->
+                </div>
+            </div>
+            
+            <div class="achievements">
+                <h3>🏆 성취</h3>
+                <div class="achievement-grid">
+                    <div class="achievement-item">
+                        <div class="achievement-icon">🎯</div>
+                        <div class="achievement-title">첫 문제 해결</div>
+                        <div class="achievement-desc">첫 번째 문제를 성공적으로 해결했습니다</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">📚</div>
+                        <div class="achievement-title">학습자</div>
+                        <div class="achievement-desc">첫 번째 과정에 등록했습니다</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">⚡</div>
+                        <div class="achievement-title">연속 학습</div>
+                        <div class="achievement-desc">3일 연속 학습했습니다</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">🔥</div>
+                        <div class="achievement-title">문제 해결사</div>
+                        <div class="achievement-desc">10개 문제를 해결했습니다</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recent-activity">
+                <h3>📈 최근 활동</h3>
+                <div id="activity-list">
+                    <!-- 최근 활동이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 페이지 로드 시 진도 정보 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            await loadProgressData();
+        });
+        
+        // 진도 데이터 로드
+        async function loadProgressData() {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('progress-content');
+            
+            try {
+                // 실제 API 호출 시뮬레이션
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                
+                // 샘플 데이터로 진도 표시
+                displaySampleProgress();
+                
+            } catch (error) {
+                console.error('진도 데이터 로드 오류:', error);
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                displaySampleProgress();
+            }
+        }
+        
+        // 샘플 진도 데이터 표시
+        function displaySampleProgress() {
+            // 전체 진도율 애니메이션
+            animateProgress('overall-progress', 'overall-percentage', 68);
+            
+            // 해결한 문제 수
+            animateProgress('problems-progress', 'problems-count', 15, 25, '개');
+            
+            // 완료한 과정 수
+            animateProgress('courses-progress', 'courses-count', 2, 5, '개');
+            
+            // 과정별 진도 표시
+            displayCourseProgress();
+            
+            // 최근 활동 표시
+            displayRecentActivity();
+        }
+        
+        // 진도 원형 차트 애니메이션
+        function animateProgress(circleId, textId, percentage, maxValue = 100, unit = '%') {
+            const circle = document.getElementById(circleId);
+            const text = document.getElementById(textId);
+            const circumference = 2 * Math.PI * 52; // r=52
+            
+            let current = 0;
+            const target = maxValue === 100 ? percentage : percentage;
+            const step = target / 50; // 50 프레임으로 애니메이션
+            
+            const animate = () => {
+                current += step;
+                if (current > target) current = target;
+                
+                const progress = maxValue === 100 ? current : (current / maxValue) * 100;
+                const dashArray = (progress / 100) * circumference;
+                
+                circle.style.strokeDasharray = `${dashArray} ${circumference}`;
+                text.textContent = Math.round(current) + unit;
+                
+                if (current < target) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // 과정별 진도 표시
+        function displayCourseProgress() {
+            const courseList = document.getElementById('course-progress-list');
+            const courses = [
+                {
+                    title: 'JavaScript 기초 프로그래밍',
+                    instructor: '김강사',
+                    progress: 85,
+                    totalLessons: 20,
+                    completedLessons: 17
+                },
+                {
+                    title: '알고리즘과 자료구조',
+                    instructor: '이교수',
+                    progress: 60,
+                    totalLessons: 15,
+                    completedLessons: 9
+                },
+                {
+                    title: 'React 웹 개발',
+                    instructor: '박개발',
+                    progress: 25,
+                    totalLessons: 25,
+                    completedLessons: 6
+                }
+            ];
+            
+            courseList.innerHTML = courses.map(course => `
+                <div class="course-progress-item">
+                    <div class="course-info">
+                        <div class="course-title">${course.title}</div>
+                        <div class="course-meta">강사: ${course.instructor} | ${course.completedLessons}/${course.totalLessons} 강의 완료</div>
+                    </div>
+                    <div class="course-progress">
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: ${course.progress}%"></div>
+                        </div>
+                        <div class="progress-percentage">${course.progress}%</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 최근 활동 표시
+        function displayRecentActivity() {
+            const activityList = document.getElementById('activity-list');
+            const activities = [
+                {
+                    icon: '🎯',
+                    title: '"두 수의 합" 문제 해결 완료',
+                    time: '2시간 전'
+                },
+                {
+                    icon: '📚',
+                    title: 'JavaScript 기초 - 변수와 함수 학습 완료',
+                    time: '1일 전'
+                },
+                {
+                    icon: '💬',
+                    title: '알고리즘 토론에 댓글 작성',
+                    time: '2일 전'
+                },
+                {
+                    icon: '⭐',
+                    title: '스택 구현하기 문제 첫 시도',
+                    time: '3일 전'
+                },
+                {
+                    icon: '📖',
+                    title: 'React 웹 개발 과정 등록',
+                    time: '5일 전'
+                }
+            ];
+            
+            activityList.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">${activity.icon}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

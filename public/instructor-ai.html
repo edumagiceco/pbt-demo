@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>강사 AI - AI 인재 커리어 플랫폼 PBT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-links a:hover,
+        .navbar .nav-links a.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            height: calc(100vh - 120px);
+        }
+        
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        
+        .sidebar h3 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .material-upload {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .material-list {
+            list-style: none;
+        }
+        
+        .material-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .material-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-left-color: #667eea;
+        }
+        
+        .material-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            border-left-color: #667eea;
+        }
+        
+        .material-title {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .material-meta {
+            font-size: 0.8rem;
+            color: #718096;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .analysis-status {
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .analysis-status.completed {
+            background: rgba(72, 187, 120, 0.1);
+            color: #38a169;
+        }
+        
+        .analysis-status.processing {
+            background: rgba(237, 137, 54, 0.1);
+            color: #dd6b20;
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .chat-header h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 300px);
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .message-content {
+            flex: 1;
+            max-width: 70%;
+        }
+        
+        .message-bubble {
+            padding: 1rem 1.25rem;
+            border-radius: 18px;
+            background: #f7fafc;
+            color: #4a5568;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+        }
+        
+        .message.user .message-time {
+            text-align: right;
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            color: #718096;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 0.3rem;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .chat-input {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            background: #f9f9f9;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .input-field {
+            flex: 1;
+            resize: none;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            min-height: 20px;
+            max-height: 120px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .send-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .send-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-action {
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+        
+        .welcome-message .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                height: auto;
+            }
+            
+            .sidebar {
+                order: 2;
+                max-height: 300px;
+            }
+            
+            .chat-container {
+                order: 1;
+                height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="/assets/images/pbt-logo.png" alt="PBT Logo">
+            <span>AI 인재 커리어 플랫폼 PBT</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard.html">대시보드</a>
+            <a href="/instructor-ai.html" class="active">강사 AI</a>
+            <a href="/mentors.html">멘토 AI</a>
+            <a href="/profile.html">프로필</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <aside class="sidebar">
+            <div class="material-upload">
+                <h3>📚 자료 업로드</h3>
+                <div class="upload-area" id="uploadArea">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+                    <p style="margin-bottom: 0.5rem; font-weight: 500;">자료를 드래그하거나 클릭하여 업로드</p>
+                    <p style="font-size: 0.8rem; color: #718096;">PDF, PPT, DOC 파일 지원 (최대 50MB)</p>
+                    <input type="file" id="fileInput" style="display: none;" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt">
+                </div>
+                <button id="uploadButton" class="send-button" style="width: 100%; margin-top: 0.5rem;" disabled>
+                    📤 업로드 시작
+                </button>
+            </div>
+            
+            <div class="material-section">
+                <h3>📖 강의 자료</h3>
+                <ul class="material-list" id="materialList">
+                    <!-- 자료 목록이 여기에 동적으로 추가됩니다 -->
+                </ul>
+            </div>
+        </aside>
+        
+        <main class="chat-container">
+            <div class="chat-header">
+                <h2>🧑‍🏫 강사 AI</h2>
+                <p id="chatDescription">강의 자료를 기반으로 개념을 설명하고 학습을 도와드립니다</p>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <div class="icon">🧑‍🏫</div>
+                    <h3>강사 AI에 오신 것을 환영합니다!</h3>
+                    <p>강의 자료를 업로드하거나 학습과 관련된 질문을 해보세요.</p>
+                    <div class="quick-actions">
+                        <button class="quick-action" onclick="sendQuickMessage('이 개념에 대해 설명해주세요')">개념 설명 요청</button>
+                        <button class="quick-action" onclick="sendQuickMessage('예시를 들어서 설명해주세요')">예시 요청</button>
+                        <button class="quick-action" onclick="sendQuickMessage('학습 방법을 알려주세요')">학습 가이드</button>
+                        <button class="quick-action" onclick="sendQuickMessage('실무에서 어떻게 활용하나요?')">실무 활용</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <span>강사 AI가 답변을 생성하고 있습니다...</span>
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-container">
+                    <textarea 
+                        id="messageInput" 
+                        class="input-field" 
+                        placeholder="강의 내용에 대해 궁금한 점을 물어보세요..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendButton" class="send-button">
+                        <span>📤</span>
+                        전송
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class InstructorAI {
+            constructor() {
+                this.currentMaterialId = null;
+                this.sessionId = `session_${Date.now()}`;
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadMaterials();
+                this.checkAuthentication();
+            }
+
+            initializeElements() {
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.uploadButton = document.getElementById('uploadButton');
+                this.materialList = document.getElementById('materialList');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.chatDescription = document.getElementById('chatDescription');
+            }
+
+            attachEventListeners() {
+                // 파일 업로드 관련
+                this.uploadArea.addEventListener('click', () => this.fileInput.click());
+                this.uploadArea.addEventListener('dragover', this.handleDragOver.bind(this));
+                this.uploadArea.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                this.uploadArea.addEventListener('drop', this.handleDrop.bind(this));
+                this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+                this.uploadButton.addEventListener('click', this.uploadFile.bind(this));
+
+                // 채팅 관련
+                this.sendButton.addEventListener('click', this.sendMessage.bind(this));
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                // 자동 리사이즈
+                this.messageInput.addEventListener('input', this.autoResize.bind(this));
+            }
+
+            checkAuthentication() {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    alert('로그인이 필요합니다.');
+                    window.location.href = '/login.html';
+                }
+            }
+
+            // 파일 드래그 앤 드롭 처리
+            handleDragOver(e) {
+                e.preventDefault();
+                this.uploadArea.classList.add('dragover');
+            }
+
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.fileInput.files = files;
+                    this.handleFileSelect();
+                }
+            }
+
+            handleFileSelect() {
+                const file = this.fileInput.files[0];
+                if (file) {
+                    this.uploadButton.disabled = false;
+                    this.uploadButton.innerHTML = `📤 "${file.name}" 업로드`;
+                } else {
+                    this.uploadButton.disabled = true;
+                    this.uploadButton.innerHTML = '📤 업로드 시작';
+                }
+            }
+
+            // 파일 업로드
+            async uploadFile() {
+                const file = this.fileInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('title', file.name);
+                formData.append('type', this.getFileType(file.name));
+
+                try {
+                    this.uploadButton.disabled = true;
+                    this.uploadButton.innerHTML = '📤 업로드 중...';
+
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/instructor-ai/materials/upload', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('자료가 성공적으로 업로드되었습니다. 분석이 진행 중입니다.');
+                        this.loadMaterials();
+                        this.fileInput.value = '';
+                        this.uploadButton.disabled = true;
+                        this.uploadButton.innerHTML = '📤 업로드 시작';
+                    } else {
+                        throw new Error(result.error || '업로드 실패');
+                    }
+
+                } catch (error) {
+                    console.error('업로드 오류:', error);
+                    alert('업로드 중 오류가 발생했습니다: ' + error.message);
+                    this.uploadButton.disabled = false;
+                    this.uploadButton.innerHTML = `📤 "${file.name}" 업로드`;
+                }
+            }
+
+            getFileType(filename) {
+                const ext = filename.toLowerCase().split('.').pop();
+                const typeMap = {
+                    'pdf': 'pdf',
+                    'ppt': 'presentation',
+                    'pptx': 'presentation',
+                    'doc': 'document',
+                    'docx': 'document',
+                    'txt': 'document'
+                };
+                return typeMap[ext] || 'document';
+            }
+
+            // 강의 자료 목록 로드
+            async loadMaterials() {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/instructor-ai/materials', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.renderMaterials(result.data.materials);
+                    } else {
+                        console.error('자료 목록 로드 실패:', result.error);
+                    }
+
+                } catch (error) {
+                    console.error('자료 목록 로드 오류:', error);
+                }
+            }
+
+            renderMaterials(materials) {
+                this.materialList.innerHTML = '';
+
+                if (materials.length === 0) {
+                    this.materialList.innerHTML = '<li style="text-align: center; padding: 1rem; color: #718096;">업로드된 자료가 없습니다</li>';
+                    return;
+                }
+
+                materials.forEach(material => {
+                    const item = document.createElement('li');
+                    item.className = 'material-item';
+                    item.onclick = () => this.selectMaterial(material);
+
+                    const statusClass = material.analyzedAt ? 'completed' : 'processing';
+                    const statusText = material.analyzedAt ? '분석 완료' : '분석 중';
+
+                    item.innerHTML = `
+                        <div class="material-title">${material.title}</div>
+                        <div class="material-meta">
+                            <span>${this.getTypeIcon(material.type)} ${material.type}</span>
+                            <span class="analysis-status ${statusClass}">${statusText}</span>
+                        </div>
+                    `;
+
+                    this.materialList.appendChild(item);
+                });
+            }
+
+            getTypeIcon(type) {
+                const icons = {
+                    'pdf': '📄',
+                    'presentation': '📊',
+                    'document': '📝',
+                    'image': '🖼️',
+                    'video': '🎥'
+                };
+                return icons[type] || '📁';
+            }
+
+            selectMaterial(material) {
+                // 이전 선택 제거
+                document.querySelectorAll('.material-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // 새로운 선택 활성화
+                event.currentTarget.classList.add('active');
+
+                this.currentMaterialId = material.id;
+                this.chatDescription.textContent = `"${material.title}" 자료에 대해 질문해보세요`;
+
+                // 환영 메시지에 자료 정보 추가
+                if (material.analyzedAt && material.summary) {
+                    this.addMessage('instructor', `"${material.title}" 자료를 선택하셨습니다.\n\n**자료 요약:**\n${material.summary}\n\n이 자료에 대해 궁금한 점이 있으시면 언제든 물어보세요!`);
+                }
+            }
+
+            // 메시지 전송
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+
+                this.addMessage('user', message);
+                this.messageInput.value = '';
+                this.showTypingIndicator();
+
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/instructor-ai/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            materialId: this.currentMaterialId,
+                            sessionId: this.sessionId,
+                            difficulty: 'intermediate'
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.hideTypingIndicator();
+                        this.addMessage('instructor', result.data.response);
+                    } else {
+                        throw new Error(result.error || '답변 생성 실패');
+                    }
+
+                } catch (error) {
+                    console.error('메시지 전송 오류:', error);
+                    this.hideTypingIndicator();
+                    this.addMessage('instructor', '죄송합니다. 답변을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+                }
+            }
+
+            // 빠른 메시지 전송
+            sendQuickMessage(message) {
+                this.messageInput.value = message;
+                this.sendMessage();
+            }
+
+            // 메시지 추가
+            addMessage(sender, content) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+
+                const avatar = sender === 'user' ? '👤' : '🧑‍🏫';
+                const time = new Date().toLocaleTimeString('ko-KR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${avatar}</div>
+                    <div class="message-content">
+                        <div class="message-bubble">${content.replace(/\n/g, '<br>')}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+
+                // 환영 메시지 제거
+                const welcomeMessage = this.chatMessages.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            showTypingIndicator() {
+                this.typingIndicator.style.display = 'flex';
+                this.scrollToBottom();
+            }
+
+            hideTypingIndicator() {
+                this.typingIndicator.style.display = 'none';
+            }
+
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+
+            autoResize() {
+                this.messageInput.style.height = 'auto';
+                this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
+            }
+        }
+
+        // 전역 함수
+        function sendQuickMessage(message) {
+            if (window.instructorAI) {
+                window.instructorAI.sendQuickMessage(message);
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            window.instructorAI = new InstructorAI();
+        });
+    </script>
+</body>
+</html>

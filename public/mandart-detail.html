@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>만다라트 상세 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .mandart-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .header-info h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-draft {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .status-active {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .status-completed {
+            background: #bee3f8;
+            color: #2a69ac;
+        }
+        
+        .center-goal {
+            font-size: 1.3rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .description {
+            color: #718096;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-width: 200px;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .progress-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .progress-card {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .progress-card .progress-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-card .progress-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .mandart-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .mandart-grid-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .mandart-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 2px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .mandart-cell {
+            background: white;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            padding: 0.3rem;
+            position: relative;
+            min-height: 70px;
+        }
+        
+        .mandart-cell:hover {
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mandart-cell.center {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .mandart-cell.goal {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .mandart-cell.task {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .mandart-cell.completed {
+            background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);
+            color: #2a69ac;
+        }
+        
+        .mandart-cell.in-progress {
+            background: linear-gradient(135deg, #fbb6ce 0%, #f687b3 100%);
+            color: #97266d;
+        }
+        
+        .cell-content {
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .cell-position {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.6rem;
+            color: #718096;
+            font-weight: bold;
+        }
+        
+        .mandart-cell.center .cell-position,
+        .mandart-cell.goal .cell-position {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .sidebar-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .info-card h3 {
+            color: #4a5568;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .meta-list {
+            list-style: none;
+        }
+        
+        .meta-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .meta-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .meta-label {
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .meta-value {
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .goals-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: #f7fafc;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .goal-title {
+            flex: 1;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .goal-progress {
+            font-size: 0.8rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .modal-header h3 {
+            color: #4a5568;
+            font-size: 1.3rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        
+        .modal-body {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .modal-body .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .modal-body .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .modal-body .form-group .value {
+            padding: 0.5rem;
+            background: #f7fafc;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .task-list {
+            margin-top: 1rem;
+        }
+        
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem;
+            margin-bottom: 0.5rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 3px solid #e2e8f0;
+        }
+        
+        .task-item.completed {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        
+        .task-item.in-progress {
+            border-left-color: #ed8936;
+            background: #fffbf0;
+        }
+        
+        @media (max-width: 1024px) {
+            .mandart-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .sidebar-panel {
+                order: -1;
+            }
+            
+            .mandart-grid {
+                max-width: 100%;
+                gap: 1px;
+            }
+            
+            .mandart-cell {
+                min-height: 50px;
+                padding: 0.2rem;
+            }
+            
+            .cell-content {
+                font-size: 0.7rem;
+                -webkit-line-clamp: 2;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-info h1 {
+                font-size: 2rem;
+            }
+            
+            .progress-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .mandart-cell {
+                min-height: 40px;
+                padding: 0.1rem;
+            }
+            
+            .cell-content {
+                font-size: 0.6rem;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html">대시보드</a>
+            <a href="/mandarts.html">만다라트</a>
+        </div>
+        <div class="user-info">
+            <span id="userName">사용자님</span>
+            <button class="logout-btn btn btn-secondary" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- 만다라트 헤더 -->
+        <div class="mandart-header">
+            <div class="header-top">
+                <div class="header-info">
+                    <h1 id="mandartTitle">
+                        🎯 <span id="titleText">만다라트 제목</span>
+                        <span id="statusBadge" class="status-badge status-draft">초안</span>
+                    </h1>
+                    <div class="center-goal" id="centerGoal">
+                        중심 목표가 여기에 표시됩니다
+                    </div>
+                    <div class="description" id="description">
+                        만다라트 설명이 여기에 표시됩니다
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="editMandart()">
+                        ✏️ 편집하기
+                    </button>
+                    <button class="btn btn-success" onclick="updateProgress()">
+                        🔄 진행률 갱신
+                    </button>
+                    <a href="/mandarts.html" class="btn btn-secondary">
+                        📋 목록으로
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 진행률 표시 -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="overallProgress" style="width: 0%"></div>
+            </div>
+            <p style="text-align: center; margin-top: 0.5rem; color: #718096;">
+                전체 진행률: <span id="progressText">0%</span>
+            </p>
+            
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-number" id="totalGoals">0</div>
+                    <div class="progress-label">총 목표 수</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-number" id="completedGoals">0</div>
+                    <div class="progress-label">완료된 목표</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-number" id="totalTasks">0</div>
+                    <div class="progress-label">총 과제 수</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-number" id="completedTasks">0</div>
+                    <div class="progress-label">완료된 과제</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 메인 콘텐츠 -->
+        <div class="mandart-content">
+            <!-- 만다라트 그리드 -->
+            <div class="mandart-grid-container">
+                <h3 style="color: #4a5568; margin-bottom: 1.5rem; text-align: center;">
+                    🎯 만다라트 보드
+                </h3>
+                <div class="mandart-grid" id="mandartGrid">
+                    <!-- 9x9 그리드가 동적으로 생성됩니다 -->
+                </div>
+                <p style="text-align: center; margin-top: 1rem; color: #718096; font-size: 0.9rem;">
+                    각 셀을 클릭하면 상세 정보를 볼 수 있습니다
+                </p>
+            </div>
+            
+            <!-- 사이드바 정보 -->
+            <div class="sidebar-panel">
+                <!-- 기본 정보 -->
+                <div class="info-card">
+                    <h3>📊 기본 정보</h3>
+                    <ul class="meta-list">
+                        <li>
+                            <span class="meta-label">생성일</span>
+                            <span class="meta-value" id="createdDate">-</span>
+                        </li>
+                        <li>
+                            <span class="meta-label">수정일</span>
+                            <span class="meta-value" id="updatedDate">-</span>
+                        </li>
+                        <li>
+                            <span class="meta-label">작성자</span>
+                            <span class="meta-value" id="authorName">-</span>
+                        </li>
+                        <li>
+                            <span class="meta-label">공개 여부</span>
+                            <span class="meta-value" id="publicStatus">비공개</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 목표 요약 -->
+                <div class="info-card">
+                    <h3>🎯 목표 요약</h3>
+                    <div class="goals-summary" id="goalsSummary">
+                        <!-- 목표 목록이 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+                
+                <!-- 최근 활동 -->
+                <div class="info-card">
+                    <h3>⚡ 최근 활동</h3>
+                    <div id="recentActivities">
+                        <p style="color: #718096; text-align: center; padding: 1rem;">
+                            활동 내역이 없습니다
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 상세 모달 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">세부 정보</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- 모달 내용이 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMandart = null;
+        let mandartData = {};
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            
+            // URL에서 만다라트 ID 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const mandartId = urlParams.get('id');
+            
+            if (!mandartId) {
+                alert('만다라트 ID가 필요합니다.');
+                window.location.href = '/mandarts.html';
+                return;
+            }
+            
+            await loadMandart(mandartId);
+        });
+
+        // 인증 확인
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.user) {
+                        document.getElementById('userName').textContent = 
+                            result.user.fullName || result.user.username;
+                    }
+                }
+            } catch (error) {
+                console.error('인증 오류:', error);
+            }
+        }
+
+        // 만다라트 데이터 로드
+        async function loadMandart(id) {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`/api/mandarts/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('만다라트를 불러올 수 없습니다.');
+                }
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    currentMandart = result.data;
+                    displayMandart(result.data);
+                } else {
+                    throw new Error(result.message || '데이터를 불러올 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('만다라트 로드 오류:', error);
+                alert('만다라트를 불러오는 중 오류가 발생했습니다.');
+                window.location.href = '/mandarts.html';
+            }
+        }
+
+        // 만다라트 표시
+        function displayMandart(mandart) {
+            // 기본 정보 표시
+            document.getElementById('titleText').textContent = mandart.title;
+            document.getElementById('centerGoal').textContent = mandart.centerGoal;
+            document.getElementById('description').textContent = mandart.description || '설명이 없습니다.';
+            
+            // 상태 배지
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.className = `status-badge status-${mandart.status}`;
+            statusBadge.textContent = {
+                'draft': '초안',
+                'active': '활성',
+                'completed': '완료',
+                'archived': '보관됨'
+            }[mandart.status] || mandart.status;
+            
+            // 진행률 표시
+            const progress = mandart.progressPercent || 0;
+            document.getElementById('overallProgress').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${progress}%`;
+            
+            // 메타 정보 표시
+            displayMetaInfo(mandart);
+            
+            // 목표와 과제 데이터 처리
+            processData(mandart);
+            
+            // 그리드 생성 및 표시
+            createMandartGrid();
+            displayGridData();
+            
+            // 통계 업데이트
+            updateStatistics();
+            
+            // 목표 요약 표시
+            displayGoalsSummary();
+        }
+
+        // 메타 정보 표시
+        function displayMetaInfo(mandart) {
+            document.getElementById('createdDate').textContent = 
+                new Date(mandart.createdAt).toLocaleDateString('ko-KR');
+            document.getElementById('updatedDate').textContent = 
+                new Date(mandart.updatedAt).toLocaleDateString('ko-KR');
+            document.getElementById('authorName').textContent = 
+                mandart.author ? (mandart.author.fullName || mandart.author.username) : '알 수 없음';
+            document.getElementById('publicStatus').textContent = 
+                mandart.isPublic ? '공개' : '비공개';
+        }
+
+        // 데이터 처리
+        function processData(mandart) {
+            mandartData = {};
+            
+            // 중심 목표
+            mandartData[40] = { // 위치 4,4 = 40
+                type: 'center',
+                title: mandart.centerGoal,
+                description: mandart.description || '',
+                status: 'active'
+            };
+            
+            // 목표 데이터
+            if (mandart.goals && mandart.goals.length > 0) {
+                mandart.goals.forEach(goal => {
+                    const position = getGridPositionFromGoal(goal.position);
+                    if (position !== -1) {
+                        mandartData[position] = {
+                            type: 'goal',
+                            title: goal.title,
+                            description: goal.description || '',
+                            status: goal.status,
+                            progressPercent: goal.progressPercent || 0,
+                            id: goal.id,
+                            tasks: []
+                        };
+                    }
+                });
+            }
+            
+            // 과제 데이터
+            if (mandart.tasks && mandart.tasks.length > 0) {
+                mandart.tasks.forEach(task => {
+                    // 해당 목표의 과제 목록에 추가
+                    const goalPosition = getGridPositionFromGoal(getGoalPositionById(task.goalId));
+                    if (goalPosition !== -1 && mandartData[goalPosition]) {
+                        mandartData[goalPosition].tasks.push(task);
+                    }
+                });
+            }
+        }
+
+        // 목표 위치를 그리드 위치로 변환
+        function getGridPositionFromGoal(goalPosition) {
+            const goalPositions = [10, 13, 16, 37, 43, 64, 67, 70]; // 8개 목표 위치
+            return goalPositions[goalPosition - 1] || -1;
+        }
+
+        // 목표 ID로 위치 찾기
+        function getGoalPositionById(goalId) {
+            if (!currentMandart.goals) return -1;
+            const goal = currentMandart.goals.find(g => g.id === goalId);
+            return goal ? goal.position : -1;
+        }
+
+        // 9x9 그리드 생성
+        function createMandartGrid() {
+            const grid = document.getElementById('mandartGrid');
+            grid.innerHTML = '';
+
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const cell = document.createElement('div');
+                    const position = row * 9 + col;
+                    
+                    cell.className = 'mandart-cell';
+                    cell.dataset.position = position;
+                    cell.onclick = () => openCellDetail(position);
+
+                    // 셀 타입 결정
+                    const cellType = getCellType(row, col);
+                    if (cellType === 'center') {
+                        cell.classList.add('center');
+                    } else if (cellType === 'goal') {
+                        cell.classList.add('goal');
+                    } else {
+                        cell.classList.add('task');
+                    }
+
+                    // 위치 번호
+                    const positionLabel = document.createElement('div');
+                    positionLabel.className = 'cell-position';
+                    positionLabel.textContent = position + 1;
+                    cell.appendChild(positionLabel);
+
+                    // 내용 영역
+                    const content = document.createElement('div');
+                    content.className = 'cell-content';
+                    content.id = `cell-content-${position}`;
+                    cell.appendChild(content);
+
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        // 셀 타입 결정
+        function getCellType(row, col) {
+            if (row === 4 && col === 4) return 'center';
+            
+            const goalPositions = [
+                [1, 1], [1, 4], [1, 7],
+                [4, 1], [4, 7],
+                [7, 1], [7, 4], [7, 7]
+            ];
+            
+            for (const [gRow, gCol] of goalPositions) {
+                if (row === gRow && col === gCol) return 'goal';
+            }
+            
+            return 'task';
+        }
+
+        // 그리드 데이터 표시
+        function displayGridData() {
+            for (let position = 0; position < 81; position++) {
+                const content = document.getElementById(`cell-content-${position}`);
+                const cell = content.parentElement;
+                
+                if (mandartData[position]) {
+                    const data = mandartData[position];
+                    content.textContent = data.title || '';
+                    
+                    // 상태에 따른 스타일 적용
+                    if (data.status === 'completed') {
+                        cell.classList.add('completed');
+                    } else if (data.status === 'in_progress') {
+                        cell.classList.add('in-progress');
+                    }
+                } else {
+                    content.textContent = '';
+                }
+            }
+        }
+
+        // 셀 상세 정보 모달 열기
+        function openCellDetail(position) {
+            const data = mandartData[position];
+            const cellType = getCellTypeByPosition(position);
+            
+            if (!data) {
+                return; // 빈 셀은 무시
+            }
+            
+            const typeLabels = {
+                'center': '중심 목표',
+                'goal': '목표',
+                'task': '과제'
+            };
+            
+            document.getElementById('modalTitle').textContent = 
+                `${typeLabels[cellType]} 상세 정보`;
+            
+            let modalContent = `
+                <div class="form-group">
+                    <label>제목</label>
+                    <div class="value">${data.title}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>설명</label>
+                    <div class="value">${data.description || '설명이 없습니다.'}</div>
+                </div>
+            `;
+            
+            if (cellType !== 'center') {
+                const statusLabels = {
+                    'not_started': '시작 전',
+                    'in_progress': '진행 중',
+                    'completed': '완료',
+                    'on_hold': '보류'
+                };
+                
+                modalContent += `
+                    <div class="form-group">
+                        <label>상태</label>
+                        <div class="value">${statusLabels[data.status] || data.status}</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>진행률</label>
+                        <div class="value">${data.progressPercent || 0}%</div>
+                        <div class="progress-bar" style="margin-top: 0.5rem;">
+                            <div class="progress-fill" style="width: ${data.progressPercent || 0}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 목표인 경우 과제 목록 표시
+            if (cellType === 'goal' && data.tasks && data.tasks.length > 0) {
+                modalContent += `
+                    <div class="form-group">
+                        <label>하위 과제 (${data.tasks.length}개)</label>
+                        <div class="task-list">
+                `;
+                
+                data.tasks.forEach(task => {
+                    const statusClass = task.status === 'completed' ? 'completed' : 
+                                      task.status === 'in_progress' ? 'in-progress' : '';
+                    
+                    modalContent += `
+                        <div class="task-item ${statusClass}">
+                            <span>${task.title}</span>
+                            <span>${task.progressPercent || 0}%</span>
+                        </div>
+                    `;
+                });
+                
+                modalContent += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalBody').innerHTML = modalContent;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        // 위치로 셀 타입 확인
+        function getCellTypeByPosition(position) {
+            const row = Math.floor(position / 9);
+            const col = position % 9;
+            return getCellType(row, col);
+        }
+
+        // 통계 업데이트
+        function updateStatistics() {
+            let totalGoals = 0;
+            let completedGoals = 0;
+            let totalTasks = 0;
+            let completedTasks = 0;
+            
+            Object.values(mandartData).forEach(item => {
+                if (item.type === 'goal') {
+                    totalGoals++;
+                    if (item.status === 'completed') {
+                        completedGoals++;
+                    }
+                    
+                    if (item.tasks) {
+                        totalTasks += item.tasks.length;
+                        completedTasks += item.tasks.filter(t => t.status === 'completed').length;
+                    }
+                }
+            });
+            
+            document.getElementById('totalGoals').textContent = totalGoals;
+            document.getElementById('completedGoals').textContent = completedGoals;
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('completedTasks').textContent = completedTasks;
+        }
+
+        // 목표 요약 표시
+        function displayGoalsSummary() {
+            const container = document.getElementById('goalsSummary');
+            container.innerHTML = '';
+            
+            const goals = Object.values(mandartData).filter(item => item.type === 'goal');
+            
+            if (goals.length === 0) {
+                container.innerHTML = '<p style="color: #718096; text-align: center;">목표가 없습니다</p>';
+                return;
+            }
+            
+            goals.forEach(goal => {
+                const goalElement = document.createElement('div');
+                goalElement.className = 'goal-item';
+                goalElement.innerHTML = `
+                    <span class="goal-title">${goal.title}</span>
+                    <span class="goal-progress">${goal.progressPercent || 0}%</span>
+                `;
+                container.appendChild(goalElement);
+            });
+        }
+
+        // 진행률 갱신
+        async function updateProgress() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`/api/mandarts/${currentMandart.id}/calculate-progress`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        // 페이지 새로고침
+                        window.location.reload();
+                    }
+                } else {
+                    throw new Error('진행률 갱신 실패');
+                }
+            } catch (error) {
+                console.error('진행률 갱신 오류:', error);
+                alert('진행률 갱신 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 편집 페이지로 이동
+        function editMandart() {
+            window.location.href = `/mandart-editor.html?id=${currentMandart.id}`;
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') {
+                closeModal();
+            }
+        });
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

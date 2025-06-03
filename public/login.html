@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - AI 인재 커리어 플랫폼 PBT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+        
+        .logo h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .logo p {
+            color: #718096;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .link-group {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        .link-group a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .link-group a:hover {
+            color: #764ba2;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .alert-error {
+            background-color: #fed7e2;
+            color: #9b2c2c;
+            border: 1px solid #feb2c5;
+        }
+        
+        .alert-success {
+            background-color: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .form-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="/assets/images/pbt-logo.png" alt="PBT Logo">
+            <h1>AI 인재 커리어 플랫폼 PBT</h1>
+            <p>로그인하여 학습을 시작하세요</p>
+        </div>
+        
+        <div id="alert-container"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">사용자명 또는 이메일</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="사용자명 또는 이메일을 입력하세요"
+                    autocomplete="username"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="비밀번호를 입력하세요"
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <button type="submit" class="btn" id="loginBtn">
+                로그인
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>로그인 중...</p>
+        </div>
+        
+        <div class="form-footer">
+            <p>아직 계정이 없으신가요? <a href="/register.html">회원가입</a></p>
+            <p><a href="/">메인 페이지로 돌아가기</a></p>
+        </div>
+    </div>
+
+    <script>
+        // DOM 요소들
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const loading = document.getElementById('loading');
+        const alertContainer = document.getElementById('alert-container');
+
+        // 알림 메시지 표시 함수
+        function showAlert(message, type = 'error') {
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            // 5초 후 알림 자동 제거
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // 로딩 상태 토글
+        function toggleLoading(show) {
+            if (show) {
+                loginForm.style.display = 'none';
+                loading.style.display = 'block';
+                loginBtn.disabled = true;
+            } else {
+                loginForm.style.display = 'block';
+                loading.style.display = 'none';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // 로그인 폼 제출 이벤트
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(loginForm);
+            const loginData = {
+                email: formData.get('username'), // 백엔드에서 email 필드로 받음
+                password: formData.get('password')
+            };
+
+            // 입력 검증
+            if (!loginData.email || !loginData.password) {
+                showAlert('사용자명과 비밀번호를 모두 입력해주세요.');
+                return;
+            }
+
+            toggleLoading(true);
+            alertContainer.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showAlert('로그인 성공! 잠시 후 대시보드로 이동합니다.', 'success');
+                    
+                    // 로그인 성공 시 토큰을 로컬 저장소에 저장 (선택사항)
+                    if (result.token) {
+                        localStorage.setItem('authToken', result.token);
+                    }
+                    
+                    // 사용자 정보 저장
+                    if (result.user) {
+                        localStorage.setItem('userInfo', JSON.stringify(result.user));
+                    }
+
+                    // 2초 후 대시보드로 리다이렉트
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 2000);
+
+                } else {
+                    showAlert(result.message || '로그인에 실패했습니다. 다시 시도해주세요.');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            // 이미 로그인되어 있으면 대시보드로 리다이렉트
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // 토큰 유효성 검사 (선택사항)
+                fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        window.location.href = '/dashboard.html';
+                    }
+                })
+                .catch(() => {
+                    // 토큰이 유효하지 않으면 제거
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userInfo');
+                });
+            }
+
+            // 포커스 이벤트 처리
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    alertContainer.innerHTML = '';
+                });
+            });
+        });
+
+        // Enter 키 처리
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !loginBtn.disabled) {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+    
+    <!-- PBT LMS 챗봇 -->
+    <script src="/js/chatbot.js"></script>
+</body>
+</html>

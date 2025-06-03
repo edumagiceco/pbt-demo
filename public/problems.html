@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문제 풀이 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .filter-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select {
+            padding: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #4a5568;
+        }
+        
+        .problem-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .problem-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .problem-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .problem-info {
+            flex: 1;
+        }
+        
+        .problem-title {
+            color: #4a5568;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .problem-description {
+            color: #718096;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .problem-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .meta-tag {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .difficulty-beginner {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .difficulty-intermediate {
+            background: #fed7c3;
+            color: #c05621;
+        }
+        
+        .difficulty-advanced {
+            background: #fed7e2;
+            color: #9b2c2c;
+        }
+        
+        .category-tag {
+            background: #e6fffa;
+            color: #234e52;
+        }
+        
+        .problem-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 100px;
+        }
+        
+        .status-icon {
+            font-size: 2rem;
+        }
+        
+        .status-solved {
+            color: #48bb78;
+        }
+        
+        .status-attempted {
+            color: #ed8936;
+        }
+        
+        .status-not-attempted {
+            color: #cbd5e0;
+        }
+        
+        .problem-score {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .problem-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .problem-status {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">문제 풀이</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>🧩 문제 풀이</h1>
+            <p>다양한 문제들을 풀어보며 실무 역량을 키워보세요</p>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="difficultyFilter">난이도</label>
+                <select id="difficultyFilter" onchange="filterProblems()">
+                    <option value="">전체</option>
+                    <option value="beginner">초급</option>
+                    <option value="intermediate">중급</option>
+                    <option value="advanced">고급</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="categoryFilter">카테고리</label>
+                <select id="categoryFilter" onchange="filterProblems()">
+                    <option value="">전체</option>
+                    <option value="algorithm">알고리즘</option>
+                    <option value="data-structure">자료구조</option>
+                    <option value="web-development">웹 개발</option>
+                    <option value="database">데이터베이스</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="statusFilter">상태</label>
+                <select id="statusFilter" onchange="filterProblems()">
+                    <option value="">전체</option>
+                    <option value="solved">해결됨</option>
+                    <option value="attempted">시도함</option>
+                    <option value="not-attempted">미시도</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>문제 목록을 불러오는 중...</p>
+        </div>
+        
+        <div id="problem-list" class="problem-list" style="display: none;">
+            <!-- 문제 목록이 여기에 동적으로 추가됩니다 -->
+        </div>
+        
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h3>🎯 조건에 맞는 문제가 없습니다</h3>
+            <p>다른 필터 조건을 선택해보세요.</p>
+        </div>
+    </div>
+
+    <script>
+        let allProblems = [];
+        
+        // 페이지 로드 시 인증 확인 및 문제 목록 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            await loadProblems();
+        });
+        
+        // 문제 목록 로드
+        async function loadProblems() {
+            const loading = document.getElementById('loading');
+            const problemList = document.getElementById('problem-list');
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch('/api/problems', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                console.log('API 응답 상태:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('API 응답 데이터:', result);
+                    
+                    allProblems = result.problems || []; // result.data 대신 result.problems 사용
+                    
+                    loading.style.display = 'none';
+                    
+                    if (allProblems.length === 0) {
+                        document.getElementById('empty-state').style.display = 'block';
+                    } else {
+                        problemList.style.display = 'block';
+                        renderProblems(allProblems);
+                    }
+                } else {
+                    console.log('API 응답 실패, 샘플 데이터 사용');
+                    loading.style.display = 'none';
+                    problemList.style.display = 'block';
+                    loadSampleProblems();
+                }
+                
+            } catch (error) {
+                console.error('문제 로드 오류:', error);
+                loading.style.display = 'none';
+                problemList.style.display = 'block';
+                loadSampleProblems();
+            }
+        }
+        
+        // 샘플 문제 데이터 로드
+        function loadSampleProblems() {
+            allProblems = [
+                {
+                    id: 1,
+                    title: '두 수의 합',
+                    description: '정수 배열에서 두 수를 더해서 특정 목표값이 나오는 인덱스를 찾는 문제입니다.',
+                    difficulty: 'beginner',
+                    category: 'algorithm',
+                    maxScore: 100,
+                    status: 'solved',
+                    userScore: 85
+                },
+                {
+                    id: 2,
+                    title: '스택 구현하기',
+                    description: '기본적인 스택 자료구조를 구현하고 주요 연산들을 작성하는 문제입니다.',
+                    difficulty: 'beginner',
+                    category: 'data-structure',
+                    maxScore: 100,
+                    status: 'attempted',
+                    userScore: 60
+                },
+                {
+                    id: 3,
+                    title: '이진 탐색 트리',
+                    description: '이진 탐색 트리를 구현하고 삽입, 검색, 삭제 연산을 구현하는 문제입니다.',
+                    difficulty: 'intermediate',
+                    category: 'data-structure',
+                    maxScore: 150,
+                    status: 'not-attempted',
+                    userScore: 0
+                },
+                {
+                    id: 4,
+                    title: 'REST API 설계',
+                    description: '사용자 관리를 위한 RESTful API를 설계하고 구현하는 문제입니다.',
+                    difficulty: 'intermediate',
+                    category: 'web-development',
+                    maxScore: 200,
+                    status: 'not-attempted',
+                    userScore: 0
+                },
+                {
+                    id: 5,
+                    title: '그래프 최단 경로',
+                    description: '다익스트라 알고리즘을 구현하여 그래프에서 최단 경로를 찾는 문제입니다.',
+                    difficulty: 'advanced',
+                    category: 'algorithm',
+                    maxScore: 300,
+                    status: 'not-attempted',
+                    userScore: 0
+                }
+            ];
+            
+            renderProblems(allProblems);
+        }
+        
+        // 문제 목록 렌더링
+        function renderProblems(problems) {
+            const problemList = document.getElementById('problem-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (problems.length === 0) {
+                problemList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            problemList.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            problemList.innerHTML = problems.map(problem => {
+                const difficultyClass = `difficulty-${problem.difficulty}`;
+                const difficultyText = {
+                    'beginner': '초급',
+                    'intermediate': '중급',
+                    'advanced': '고급'
+                }[problem.difficulty] || '초급';
+                
+                // 실제 API 데이터의 카테고리 매핑
+                const categoryText = {
+                    'Algorithm': '알고리즘',
+                    'Math': '수학',
+                    'String': '문자열',
+                    'Array': '배열',
+                    'algorithm': '알고리즘',
+                    'data-structure': '자료구조',
+                    'web-development': '웹 개발',
+                    'database': '데이터베이스'
+                }[problem.category] || problem.category || '기타';
+                
+                // 상태는 API에서 제공되지 않으므로 기본값 설정
+                const status = problem.status || 'not-attempted';
+                const statusIcon = {
+                    'solved': '✅',
+                    'attempted': '🔄',
+                    'not-attempted': '⭕'
+                }[status] || '⭕';
+                
+                const statusClass = `status-${status}`;
+                
+                return `
+                    <div class="problem-card" onclick="openProblem(${problem.id})">
+                        <div class="problem-info">
+                            <div class="problem-title">${problem.title}</div>
+                            <div class="problem-description">${problem.description ? problem.description.substring(0, 100) + '...' : '문제 설명이 준비되어 있습니다.'}</div>
+                            <div class="problem-meta">
+                                <span class="meta-tag ${difficultyClass}">${difficultyText}</span>
+                                <span class="meta-tag category-tag">${categoryText}</span>
+                                <span>최대 점수: ${problem.maxScore || 100}점</span>
+                                ${problem.timeLimit ? `<span>⏱️ ${problem.timeLimit}분</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="problem-status">
+                            <div class="status-icon ${statusClass}">${statusIcon}</div>
+                            <div class="problem-score">${problem.userScore || 0}/${problem.maxScore || 100}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 문제 필터링
+        function filterProblems() {
+            const difficultyFilter = document.getElementById('difficultyFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filteredProblems = allProblems;
+            
+            if (difficultyFilter) {
+                filteredProblems = filteredProblems.filter(p => p.difficulty === difficultyFilter);
+            }
+            
+            if (categoryFilter) {
+                filteredProblems = filteredProblems.filter(p => p.category === categoryFilter);
+            }
+            
+            if (statusFilter) {
+                filteredProblems = filteredProblems.filter(p => p.status === statusFilter);
+            }
+            
+            renderProblems(filteredProblems);
+        }
+        
+        // 문제 열기
+        function openProblem(problemId) {
+            window.location.href = `/problem-detail.html?id=${problemId}`;
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

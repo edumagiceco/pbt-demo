@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>강의 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .lecture-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+        }
+        
+        .lecture-header {
+            margin-bottom: 2rem;
+        }
+        
+        .lecture-title {
+            font-size: 2rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+        
+        .lecture-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+        }
+        
+        .video-container {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #youtube-player {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        #video-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+        
+        .lecture-content {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .lecture-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .progress-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .lecture-navigation {
+                flex-direction: column;
+            }
+            
+            .video-container {
+                height: 250px;
+            }
+            
+            #youtube-player {
+                height: 100%;
+            }
+        }
+
+        /* 강사 AI 위젯 스타일 */
+        .instructor-ai-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 400px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .widget-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .widget-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .widget-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user {
+            background: #667eea;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .chat-message.ai {
+            background: #f7fafc;
+            color: #4a5568;
+            align-self: flex-start;
+            border: 1px solid #e2e8f0;
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-send {
+            padding: 0.75rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .chat-send:hover {
+            background: #5a6fd8;
+        }
+
+        .chat-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .ai-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 0.75rem 1rem;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            align-self: flex-start;
+            max-width: 80%;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #cbd5e0;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .instructor-ai-widget {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                width: auto;
+                height: 400px;
+            }
+
+            .ai-toggle-btn {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/courses.html">내 과정</a> > 
+            <a href="#" id="course-link">JavaScript 기초 프로그래밍</a> > 
+            <span id="lecture-breadcrumb">강의</span>
+        </div>
+        
+        <div class="lecture-container">
+            <div class="lecture-header">
+                <h1 class="lecture-title" id="lecture-title">강의 제목</h1>
+                <div class="lecture-meta">
+                    <div class="meta-item">
+                        <span>🎥</span>
+                        <span>동영상 강의</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>⏱️</span>
+                        <span id="lecture-duration">30분</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>👨‍🏫</span>
+                        <span>강사: <span id="instructor-name">김강사</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="video-container">
+                <div id="youtube-player"></div>
+                <div id="video-loading" style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 1.2rem;">
+                    🎥 동영상을 로딩 중입니다...
+                </div>
+            </div>
+            
+            <div class="lecture-content">
+                <h3>📝 강의 내용</h3>
+                <div id="lecture-description">
+                    이 강의에서는 JavaScript의 기본 문법과 개념을 학습합니다. 
+                    변수 선언, 데이터 타입, 연산자 등 프로그래밍의 기초가 되는 내용들을 다룹니다.
+                </div>
+            </div>
+            
+            <div class="lecture-navigation">
+                <button class="btn btn-secondary" id="prev-btn" onclick="goToPrevLecture()">
+                    ← 이전 강의
+                </button>
+                <button class="btn btn-primary" onclick="markAsCompleted()">
+                    ✅ 완료 처리
+                </button>
+                <button class="btn btn-secondary" id="next-btn" onclick="goToNextLecture()">
+                    다음 강의 →
+                </button>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>강의 진도</span>
+                <span id="lecture-progress">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 강사 AI 토글 버튼 -->
+    <button class="ai-toggle-btn" onclick="toggleInstructorAI()" title="강사 AI와 대화하기">
+        🎓
+    </button>
+
+    <!-- 강사 AI 위젯 -->
+    <div class="instructor-ai-widget" id="instructorAIWidget">
+        <div class="widget-header">
+            <div class="widget-title">
+                🎓 강사 AI
+                <small style="font-size: 0.8rem; opacity: 0.9;">강의 내용을 설명해드려요</small>
+            </div>
+            <button class="widget-close" onclick="toggleInstructorAI()">×</button>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message ai">
+                    안녕하세요! 강사 AI입니다. 🎓<br>
+                    현재 강의 내용에 대해 궁금한 점이 있으시면 언제든 물어보세요!<br><br>
+                    <strong>도움을 드릴 수 있는 것들:</strong><br>
+                    • 강의 개념 설명<br>
+                    • 예시와 비유를 통한 이해<br>
+                    • 학습 방법 제안<br>
+                    • 관련 내용 추가 설명
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <span style="margin-left: 0.5rem; font-size: 0.8rem; color: #718096;">
+                    강사 AI가 답변을 준비 중입니다...
+                </span>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" 
+                       class="chat-input" 
+                       id="chatInput" 
+                       placeholder="강의 내용에 대해 질문하세요..."
+                       onkeypress="handleKeyPress(event)">
+                <button class="chat-send" 
+                        id="sendBtn" 
+                        onclick="sendMessage()">
+                    전송
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // YouTube Player 관련 변수
+        let player;
+        let videoWatchTime = 0;
+        let videoDuration = 0;
+        let watchStartTime = null;
+        
+        // YouTube IFrame API 로드
+        function loadYouTubeAPI() {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+        
+        // YouTube API가 준비되면 호출되는 함수
+        function onYouTubeIframeAPIReady() {
+            // 강의별 YouTube 비디오 ID 매핑
+            const videoIds = {
+                '1': 'FkN3kYBpZ-w', // JavaScript 소개
+                '2': 'FkN3kYBpZ-w', // 변수와 데이터 타입 (샘플용으로 같은 영상)
+                '3': 'FkN3kYBpZ-w', // 함수와 스코프 (샘플용으로 같은 영상)
+                '4': 'FkN3kYBpZ-w', // 객체와 배열 (샘플용으로 같은 영상)
+                '5': 'FkN3kYBpZ-w'  // DOM 조작 (샘플용으로 같은 영상)
+            };
+            
+            const videoId = videoIds[lectureId] || 'FkN3kYBpZ-w';
+            
+            player = new YT.Player('youtube-player', {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: {
+                    'playsinline': 1,
+                    'rel': 0, // 관련 동영상 숨김
+                    'showinfo': 0, // 동영상 정보 숨김
+                    'controls': 1, // 컨트롤 표시
+                    'modestbranding': 1, // YouTube 로고 최소화
+                    'cc_load_policy': 0, // 자막 기본 비활성화
+                    'iv_load_policy': 3, // 주석 비활성화
+                    'fs': 1, // 전체화면 허용
+                    'enablejsapi': 1, // JavaScript API 활성화
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+        
+        // 플레이어 준비 완료
+        function onPlayerReady(event) {
+            console.log('YouTube Player is ready');
+            
+            // 로딩 메시지 숨김
+            const loadingDiv = document.getElementById('video-loading');
+            if (loadingDiv) {
+                loadingDiv.style.display = 'none';
+            }
+            
+            // 동영상 총 시간 가져오기
+            videoDuration = player.getDuration();
+            
+            // 플레이어가 준비되었음을 표시
+            showPlayerReadyMessage();
+        }
+        
+        // 플레이어 상태 변경 처리
+        function onPlayerStateChange(event) {
+            const currentTime = player.getCurrentTime();
+            
+            switch (event.data) {
+                case YT.PlayerState.PLAYING:
+                    console.log('Video started playing');
+                    watchStartTime = Date.now();
+                    startProgressTracking();
+                    break;
+                    
+                case YT.PlayerState.PAUSED:
+                    console.log('Video paused');
+                    if (watchStartTime) {
+                        videoWatchTime += (Date.now() - watchStartTime) / 1000;
+                        watchStartTime = null;
+                    }
+                    stopProgressTracking();
+                    break;
+                    
+                case YT.PlayerState.ENDED:
+                    console.log('Video ended');
+                    if (watchStartTime) {
+                        videoWatchTime += (Date.now() - watchStartTime) / 1000;
+                        watchStartTime = null;
+                    }
+                    onVideoCompleted();
+                    break;
+                    
+                case YT.PlayerState.BUFFERING:
+                    console.log('Video buffering');
+                    break;
+                    
+                case YT.PlayerState.CUED:
+                    console.log('Video cued');
+                    break;
+            }
+            
+            updateWatchProgress();
+        }
+        
+        // 플레이어 에러 처리
+        function onPlayerError(event) {
+            console.error('YouTube Player Error:', event.data);
+            
+            const loadingDiv = document.getElementById('video-loading');
+            if (loadingDiv) {
+                loadingDiv.innerHTML = `
+                    <div style="text-align: center;">
+                        ⚠️ 동영상을 로드할 수 없습니다<br>
+                        <small style="opacity: 0.8;">네트워크 연결을 확인해주세요</small>
+                    </div>
+                `;
+                loadingDiv.style.display = 'flex';
+            }
+            
+            // 에러 타입별 처리
+            const errorMessages = {
+                2: '잘못된 매개변수가 포함되어 있습니다',
+                5: 'HTML5 플레이어에 오류가 발생했습니다',
+                100: '요청한 동영상을 찾을 수 없습니다',
+                101: '동영상 소유자가 임베드를 허용하지 않습니다',
+                150: '동영상 소유자가 임베드를 허용하지 않습니다'
+            };
+            
+            const errorMessage = errorMessages[event.data] || '알 수 없는 오류가 발생했습니다';
+            console.error('YouTube Error:', errorMessage);
+        }
+        
+        // 진도 추적 시작
+        let progressInterval;
+        function startProgressTracking() {
+            stopProgressTracking(); // 기존 인터벌 정리
+            
+            progressInterval = setInterval(() => {
+                if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    updateWatchProgress();
+                }
+            }, 1000); // 1초마다 업데이트
+        }
+        
+        // 진도 추적 중지
+        function stopProgressTracking() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+        
+        // 시청 진도 업데이트
+        function updateWatchProgress() {
+            if (!player || !videoDuration) return;
+            
+            const currentTime = player.getCurrentTime();
+            const watchPercentage = Math.min((currentTime / videoDuration) * 100, 100);
+            
+            // UI 업데이트
+            const progressElement = document.getElementById('progress-fill');
+            const progressLabel = document.getElementById('lecture-progress');
+            
+            if (progressElement && progressLabel) {
+                progressElement.style.width = watchPercentage + '%';
+                progressLabel.textContent = Math.round(watchPercentage) + '%';
+            }
+            
+            // 80% 이상 시청 시 완료로 간주
+            if (watchPercentage >= 80) {
+                markVideoAsWatched();
+            }
+        }
+        
+        // 동영상 시청 완료 처리
+        function onVideoCompleted() {
+            console.log('Video completed');
+            updateWatchProgress();
+            
+            // 완료 메시지 표시
+            setTimeout(() => {
+                if (confirm('강의를 모두 시청하셨습니다! 완료 처리하시겠습니까?')) {
+                    markAsCompleted();
+                }
+            }, 1000);
+        }
+        
+        // 동영상 시청 완료 표시
+        let isVideoWatched = false;
+        function markVideoAsWatched() {
+            if (!isVideoWatched) {
+                isVideoWatched = true;
+                console.log('Video marked as watched (80%+ completion)');
+                
+                // 서버에 진도 업데이트 전송 (실제 구현 시)
+                // updateServerProgress(courseId, lectureId, 100);
+            }
+        }
+        
+        // 플레이어 준비 완료 메시지
+        function showPlayerReadyMessage() {
+            // 간단한 토스트 메시지 표시
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(102, 126, 234, 0.9);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 0.9rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                backdrop-filter: blur(10px);
+            `;
+            toast.textContent = '🎥 동영상이 준비되었습니다!';
+            document.body.appendChild(toast);
+            
+            // 3초 후 제거
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+        
+        // URL에서 과정 ID와 강의 ID 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseId');
+        const lectureId = urlParams.get('lectureId');
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!courseId || !lectureId) {
+                alert('잘못된 접근입니다.');
+                history.back();
+                return;
+            }
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // 강의 정보 로드
+            await loadLectureDetail(courseId, lectureId);
+            
+            // YouTube API 로드
+            loadYouTubeAPI();
+            
+            // 기존 가이드 표시
+            setTimeout(showAIGuide, 5000);
+        });
+        
+        // 강의 상세 정보 로드
+        async function loadLectureDetail(courseId, lectureId) {
+            try {
+                // 샘플 데이터
+                const lectures = {
+                    '1': { id: 1, title: 'JavaScript 소개', duration: 30, description: 'JavaScript의 역사와 기본 개념을 소개합니다.' },
+                    '2': { id: 2, title: '변수와 데이터 타입', duration: 45, description: '변수 선언 방법과 다양한 데이터 타입을 학습합니다.' },
+                    '3': { id: 3, title: '함수와 스코프', duration: 60, description: '함수 정의와 호출, 스코프의 개념을 이해합니다.' },
+                    '4': { id: 4, title: '객체와 배열', duration: 50, description: '객체와 배열의 생성 및 조작 방법을 배웁니다.' },
+                    '5': { id: 5, title: 'DOM 조작', duration: 75, description: 'DOM을 활용한 웹 페이지 조작 방법을 학습합니다.' }
+                };
+                
+                const lecture = lectures[lectureId];
+                if (!lecture) {
+                    alert('존재하지 않는 강의입니다.');
+                    history.back();
+                    return;
+                }
+                
+                // 강의 정보 표시
+                document.getElementById('lecture-title').textContent = lecture.title;
+                document.getElementById('lecture-breadcrumb').textContent = lecture.title;
+                document.getElementById('lecture-duration').textContent = lecture.duration + '분';
+                document.getElementById('lecture-description').textContent = lecture.description;
+                document.getElementById('course-link').href = `/course-detail.html?id=${courseId}`;
+                
+                // 이전/다음 버튼 상태 설정
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                if (lectureId === '1') {
+                    prevBtn.disabled = true;
+                }
+                
+                if (lectureId === '5') {
+                    nextBtn.disabled = true;
+                }
+                
+                // 진도 설정 (샘플)
+                const progress = Math.random() * 100;
+                document.getElementById('lecture-progress').textContent = Math.round(progress) + '%';
+                document.getElementById('progress-fill').style.width = progress + '%';
+                
+            } catch (error) {
+                console.error('강의 로드 오류:', error);
+                alert('강의 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 이전 강의로 이동
+        function goToPrevLecture() {
+            const prevId = parseInt(lectureId) - 1;
+            if (prevId >= 1) {
+                window.location.href = `/lecture.html?courseId=${courseId}&lectureId=${prevId}`;
+            }
+        }
+        
+        // 다음 강의로 이동
+        function goToNextLecture() {
+            const nextId = parseInt(lectureId) + 1;
+            if (nextId <= 5) {
+                window.location.href = `/lecture.html?courseId=${courseId}&lectureId=${nextId}`;
+            }
+        }
+        
+        // 완료 처리
+        function markAsCompleted() {
+            if (confirm('이 강의를 완료 처리하시겠습니까?')) {
+                alert('강의가 완료 처리되었습니다!');
+                // 실제로는 서버에 완료 상태를 전송
+                // 다음 강의로 자동 이동
+                const nextId = parseInt(lectureId) + 1;
+                if (nextId <= 5) {
+                    setTimeout(() => {
+                        window.location.href = `/lecture.html?courseId=${courseId}&lectureId=${nextId}`;
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        window.location.href = `/course-detail.html?id=${courseId}`;
+                    }, 1000);
+                }
+            }
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+
+        // 강사 AI 관련 변수
+        let currentSessionId = null;
+        let isAIResponding = false;
+
+        // 강사 AI 위젯 토글
+        function toggleInstructorAI() {
+            const widget = document.getElementById('instructorAIWidget');
+            const toggleBtn = document.querySelector('.ai-toggle-btn');
+            
+            if (widget.style.display === 'none' || widget.style.display === '') {
+                widget.style.display = 'flex';
+                toggleBtn.style.display = 'none';
+                document.getElementById('chatInput').focus();
+            } else {
+                widget.style.display = 'none';
+                toggleBtn.style.display = 'block';
+            }
+        }
+
+        // 엔터 키 처리
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !isAIResponding) {
+                sendMessage();
+            }
+        }
+
+        // 메시지 전송
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || isAIResponding) return;
+            
+            // 사용자 메시지 추가
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // 전송 버튼 비활성화 및 로딩 표시
+            const sendBtn = document.getElementById('sendBtn');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            isAIResponding = true;
+            sendBtn.disabled = true;
+            typingIndicator.style.display = 'block';
+            
+            // 채팅 메시지 영역 스크롤
+            scrollToBottom();
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/instructor-ai/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        lectureId: courseId,
+                        materialId: null, // 현재는 null, 추후 강의 자료 ID 연결
+                        sessionId: currentSessionId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 세션 ID 저장
+                    currentSessionId = data.data.sessionId;
+                    
+                    // AI 응답 추가
+                    addMessage(data.data.response, 'ai');
+                } else {
+                    addMessage('죄송합니다. 응답을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.', 'ai');
+                }
+            } catch (error) {
+                console.error('강사 AI 오류:', error);
+                addMessage('네트워크 오류가 발생했습니다. 인터넷 연결을 확인하고 다시 시도해주세요.', 'ai');
+            } finally {
+                // 로딩 상태 해제
+                isAIResponding = false;
+                sendBtn.disabled = false;
+                typingIndicator.style.display = 'none';
+                scrollToBottom();
+            }
+        }
+
+        // 메시지 추가
+        function addMessage(message, type) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            
+            // 메시지 내용 포맷팅 (줄바꿈 처리)
+            const formattedMessage = message.replace(/\n/g, '<br>');
+            messageDiv.innerHTML = formattedMessage;
+            
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // 채팅 영역 스크롤 하단으로 이동
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 강사 AI 사용 안내 메시지 표시
+        function showAIGuide() {
+            const guideMessages = [
+                "💡 **팁**: '이 개념을 쉽게 설명해주세요'라고 물어보세요!",
+                "🔍 **예시**: '실제 예시를 들어 설명해주세요'",
+                "📚 **학습법**: '이 내용을 효과적으로 학습하는 방법은?'",
+                "❓ **질문**: '이 부분이 이해가 안 되는데 도와주세요'"
+            ];
+            
+            const randomGuide = guideMessages[Math.floor(Math.random() * guideMessages.length)];
+            
+            setTimeout(() => {
+                addMessage(randomGuide, 'ai');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자료실 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+        
+        .filter-select {
+            padding: 0.8rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .view-toggle {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+        
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn.active {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .materials-list {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .material-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .material-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .material-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .material-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        
+        .material-description {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .material-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-bottom: 1rem;
+        }
+        
+        .material-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .material-list-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .material-list-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .list-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .list-content {
+            flex: 1;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.25rem;
+        }
+        
+        .list-meta {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .list-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .empty-state {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .empty-state h3 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .category-document { background: #e6fffa; color: #285e61; }
+        .category-video { background: #fef5e7; color: #744210; }
+        .category-presentation { background: #e6fffa; color: #285e61; }
+        .category-code { background: #f0fff4; color: #22543d; }
+        .category-link { background: #ebf8ff; color: #2a69ac; }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .materials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .material-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .list-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 풀이</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/courses.html">내 과정</a> > 
+            <a href="#" id="course-link">JavaScript 기초 프로그래밍</a> > 
+            <span>자료실</span>
+        </div>
+        
+        <div class="page-header">
+            <h1>📚 자료실</h1>
+            <p>과정 관련 자료와 참고 문서를 확인하세요</p>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="자료 검색..." id="search-input">
+                <span class="search-icon">🔍</span>
+            </div>
+            
+            <select class="filter-select" id="category-filter">
+                <option value="">모든 카테고리</option>
+                <option value="document">문서</option>
+                <option value="video">동영상</option>
+                <option value="presentation">프레젠테이션</option>
+                <option value="code">코드</option>
+                <option value="link">링크</option>
+            </select>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="toggleView('grid')" id="grid-btn">📋</button>
+                <button class="view-btn" onclick="toggleView('list')" id="list-btn">📄</button>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>자료를 불러오는 중...</p>
+        </div>
+        
+        <div id="materials-grid" class="materials-grid" style="display: none;">
+            <!-- 자료 목록이 여기에 동적으로 추가됩니다 -->
+        </div>
+        
+        <div id="materials-list" class="materials-list">
+            <!-- 리스트 뷰 자료가 여기에 추가됩니다 -->
+        </div>
+        
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h3>📁 등록된 자료가 없습니다</h3>
+            <p>강사가 자료를 업로드하면 이곳에 표시됩니다.</p>
+        </div>
+    </div>
+
+    <script>
+        // URL에서 과정 ID 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
+        
+        let allMaterials = [];
+        let currentView = 'grid';
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!courseId) {
+                alert('잘못된 접근입니다.');
+                history.back();
+                return;
+            }
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            await loadMaterials(courseId);
+            setupEventListeners();
+        });
+        
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            document.getElementById('search-input').addEventListener('input', filterMaterials);
+            document.getElementById('category-filter').addEventListener('change', filterMaterials);
+        }
+        
+        // 자료 목록 로드
+        async function loadMaterials(courseId) {
+            const loading = document.getElementById('loading');
+            const gridContainer = document.getElementById('materials-grid');
+            const listContainer = document.getElementById('materials-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            try {
+                // 초기 상태 설정
+                loading.style.display = 'block';
+                gridContainer.style.display = 'none';
+                listContainer.style.display = 'none';
+                emptyState.style.display = 'none';
+                
+                const token = localStorage.getItem('authToken');
+                
+                // 실제 API 호출
+                const response = await fetch(`/api/materials?courseId=${courseId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                loading.style.display = 'none';
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    let materials = result.data || [];
+                    
+                    // API 데이터를 UI에 맞게 변환
+                    materials = materials.map(material => ({
+                        id: material.id,
+                        title: material.title,
+                        description: material.description,
+                        type: material.type,
+                        fileSize: formatFileSize(material.fileSize),
+                        downloadCount: material.downloadCount || 0,
+                        uploadedAt: new Date(material.createdAt).toLocaleDateString('ko-KR'),
+                        url: material.url || '#',
+                        icon: getTypeIcon(material.type)
+                    }));
+                    
+                    allMaterials = materials;
+                    
+                    if (allMaterials.length === 0) {
+                        emptyState.style.display = 'block';
+                    } else {
+                        document.getElementById('course-link').href = `/course-detail.html?id=${courseId}`;
+                        renderMaterials(allMaterials);
+                    }
+                    
+                } else {
+                    throw new Error('API 호출 실패');
+                }
+                
+            } catch (error) {
+                console.error('자료 로드 오류:', error);
+                loading.style.display = 'none';
+                
+                // 오류 시 샘플 데이터 사용
+                const sampleMaterials = [
+                    {
+                        id: 1,
+                        title: 'JavaScript 기초 가이드',
+                        description: 'JavaScript 문법과 기본 개념을 정리한 PDF 문서',
+                        type: 'document',
+                        fileSize: '2.5MB',
+                        downloadCount: 42,
+                        uploadedAt: '2025-05-20',
+                        url: '#',
+                        icon: '📄'
+                    },
+                    {
+                        id: 2,
+                        title: '함수와 스코프 강의영상',
+                        description: '함수 선언, 호출, 스코프에 대한 상세 설명 영상',
+                        type: 'video',
+                        fileSize: '125MB',
+                        downloadCount: 38,
+                        uploadedAt: '2025-05-22',
+                        url: '#',
+                        icon: '🎥'
+                    },
+                    {
+                        id: 3,
+                        title: '과제 템플릿 코드',
+                        description: '함수 실습 과제를 위한 시작 코드 템플릿',
+                        type: 'code',
+                        fileSize: '1.2KB',
+                        downloadCount: 56,
+                        uploadedAt: '2025-05-23',
+                        url: '#',
+                        icon: '💻'
+                    },
+                    {
+                        id: 4,
+                        title: 'JavaScript 참고 자료',
+                        description: 'MDN JavaScript 문서 링크 모음',
+                        type: 'link',
+                        fileSize: '-',
+                        downloadCount: 28,
+                        uploadedAt: '2025-05-21',
+                        url: 'https://developer.mozilla.org/ko/docs/Web/JavaScript',
+                        icon: '🔗'
+                    },
+                    {
+                        id: 5,
+                        title: '실습 환경 설정 가이드',
+                        description: 'VS Code 및 브라우저 개발자 도구 설정 방법',
+                        type: 'presentation',
+                        fileSize: '15MB',
+                        downloadCount: 33,
+                        uploadedAt: '2025-05-19',
+                        url: '#',
+                        icon: '📊'
+                    },
+                    {
+                        id: 6,
+                        title: '디버깅 기법 소개',
+                        description: 'JavaScript 코드 디버깅 방법과 도구 사용법',
+                        type: 'document',
+                        fileSize: '1.8MB',
+                        downloadCount: 25,
+                        uploadedAt: '2025-05-24',
+                        url: '#',
+                        icon: '📄'
+                    }
+                ];
+                
+                allMaterials = sampleMaterials;
+                document.getElementById('course-link').href = `/course-detail.html?id=${courseId}`;
+                renderMaterials(allMaterials);
+            }
+        }
+        
+        // 파일 크기 포맷팅 함수
+        function formatFileSize(bytes) {
+            if (!bytes) return '-';
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 타입별 아이콘 가져오기
+        function getTypeIcon(type) {
+            const icons = {
+                'document': '📄',
+                'video': '🎥',
+                'presentation': '📊',
+                'code': '💻',
+                'link': '🔗',
+                'image': '🖼️',
+                'audio': '🎵',
+                'archive': '📦'
+            };
+            return icons[type] || '📄';
+        }
+        
+        // 자료 목록 렌더링
+        function renderMaterials(materials) {
+            if (currentView === 'grid') {
+                renderGridView(materials);
+            } else {
+                renderListView(materials);
+            }
+        }
+        
+        // 그리드 뷰 렌더링
+        function renderGridView(materials) {
+            const container = document.getElementById('materials-grid');
+            
+            container.innerHTML = materials.map(material => `
+                <div class="material-card" onclick="viewMaterial(${material.id})">
+                    <div class="material-icon">${material.icon}</div>
+                    <div class="category-badge category-${material.type}">
+                        ${getCategoryText(material.type)}
+                    </div>
+                    <div class="material-title">${material.title}</div>
+                    <div class="material-description">${material.description}</div>
+                    <div class="material-meta">
+                        <span>📁 ${material.fileSize}</span>
+                        <span>⬇️ ${material.downloadCount}</span>
+                        <span>📅 ${material.uploadedAt}</span>
+                    </div>
+                    <div class="material-actions">
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); downloadMaterial(${material.id})">
+                            다운로드
+                        </button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); viewMaterial(${material.id})">
+                            보기
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.style.display = 'grid';
+            document.getElementById('materials-list').style.display = 'none';
+        }
+        
+        // 리스트 뷰 렌더링
+        function renderListView(materials) {
+            const container = document.getElementById('materials-list');
+            
+            container.innerHTML = materials.map(material => `
+                <div class="material-list-item" onclick="viewMaterial(${material.id})">
+                    <div class="list-icon">${material.icon}</div>
+                    <div class="list-content">
+                        <div class="list-title">${material.title}</div>
+                        <div class="list-meta">
+                            ${getCategoryText(material.type)} • ${material.fileSize} • ${material.downloadCount}회 다운로드 • ${material.uploadedAt}
+                        </div>
+                    </div>
+                    <div class="list-actions">
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); downloadMaterial(${material.id})">
+                            다운로드
+                        </button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); viewMaterial(${material.id})">
+                            보기
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.style.display = 'flex';
+            document.getElementById('materials-grid').style.display = 'none';
+        }
+        
+        // 뷰 전환
+        function toggleView(view) {
+            currentView = view;
+            
+            document.getElementById('grid-btn').classList.toggle('active', view === 'grid');
+            document.getElementById('list-btn').classList.toggle('active', view === 'list');
+            
+            renderMaterials(filterMaterialsData());
+        }
+        
+        // 자료 필터링
+        function filterMaterials() {
+            const filteredMaterials = filterMaterialsData();
+            renderMaterials(filteredMaterials);
+        }
+        
+        function filterMaterialsData() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+            
+            return allMaterials.filter(material => {
+                const matchesSearch = material.title.toLowerCase().includes(searchTerm) ||
+                                    material.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || material.type === categoryFilter;
+                
+                return matchesSearch && matchesCategory;
+            });
+        }
+        
+        // 자료 다운로드
+        function downloadMaterial(materialId) {
+            const material = allMaterials.find(m => m.id === materialId);
+            if (!material) return;
+            
+            // 링크 타입의 경우 새 창에서 열기
+            if (material.type === 'link') {
+                window.open(material.url, '_blank');
+                return;
+            }
+            
+            // 실제로는 서버에서 파일을 다운로드
+            alert(`"${material.title}" 다운로드를 시작합니다.`);
+            
+            // 다운로드 카운트 증가 (실제로는 서버에서 처리)
+            material.downloadCount += 1;
+            renderMaterials(filterMaterialsData());
+        }
+        
+        // 자료 보기
+        function viewMaterial(materialId) {
+            const material = allMaterials.find(m => m.id === materialId);
+            if (!material) return;
+            
+            if (material.type === 'link') {
+                window.open(material.url, '_blank');
+            } else {
+                // 자료 뷰어 모달이나 새 페이지로 이동
+                alert(`"${material.title}"을(를) 확인합니다.`);
+            }
+        }
+        
+        // 카테고리 텍스트 변환
+        function getCategoryText(type) {
+            const categories = {
+                'document': '문서',
+                'video': '동영상',
+                'presentation': '프레젠테이션',
+                'code': '코드',
+                'link': '링크'
+            };
+            return categories[type] || type;
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

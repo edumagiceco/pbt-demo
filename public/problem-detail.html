@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문제 상세 - PBT LMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .navbar .logout-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 120px);
+        }
+        
+        .problem-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        
+        .code-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .problem-header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .problem-title {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .problem-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .meta-tag {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .difficulty-beginner {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .difficulty-intermediate {
+            background: #fed7c3;
+            color: #c05621;
+        }
+        
+        .difficulty-advanced {
+            background: #fed7e2;
+            color: #9b2c2c;
+        }
+        
+        .category-tag {
+            background: #e6fffa;
+            color: #234e52;
+        }
+        
+        .problem-description {
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .problem-examples {
+            margin-top: 1.5rem;
+        }
+        
+        .example {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .example-title {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        
+        .example-content {
+            background: #1a202c;
+            color: #f7fafc;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .language-selector {
+            padding: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .code-editor {
+            flex: 1;
+            background: #1a202c;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #f7fafc;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .btn-run {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .btn-run:hover {
+            background: #3182ce;
+        }
+        
+        .btn-submit {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background: #38a169;
+        }
+        
+        .btn-reset {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background: #dd6b20;
+        }
+        
+        .output-section {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 150px;
+        }
+        
+        .output-header {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        
+        .output-content {
+            background: #1a202c;
+            color: #f7fafc;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            min-height: 100px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .code-panel {
+                min-height: 600px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+                gap: 1rem;
+            }
+            
+            .problem-panel, .code-panel {
+                padding: 1rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧩 PBT LMS</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="nav-link">대시보드</a>
+            <a href="/courses.html" class="nav-link">내 과정</a>
+            <a href="/problems.html" class="nav-link">문제 목록</a>
+            <a href="/discussions.html" class="nav-link">토론</a>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- 문제 정보 패널 -->
+        <div class="problem-panel">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>문제 정보를 불러오는 중...</p>
+            </div>
+            
+            <div id="problem-content" style="display: none;">
+                <div class="problem-header">
+                    <h1 id="problem-title" class="problem-title">문제 제목</h1>
+                    <div id="problem-meta" class="problem-meta">
+                        <!-- 메타 정보가 여기에 추가됩니다 -->
+                    </div>
+                </div>
+                
+                <div id="problem-description" class="problem-description">
+                    <!-- 문제 설명이 여기에 추가됩니다 -->
+                </div>
+                
+                <div class="problem-examples">
+                    <h3>예제</h3>
+                    <div id="examples-container">
+                        <!-- 예제들이 여기에 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 코드 에디터 패널 -->
+        <div class="code-panel">
+            <div class="code-header">
+                <h3>코드 작성</h3>
+                <select id="language-selector" class="language-selector" onchange="changeLanguage()">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+            </div>
+            
+            <textarea id="code-editor" class="code-editor" placeholder="여기에 코드를 작성하세요..."></textarea>
+            
+            <div class="action-buttons">
+                <button class="btn btn-run" onclick="runCode()">▶️ 실행</button>
+                <button class="btn btn-submit" onclick="submitCode()">✅ 제출</button>
+                <button class="btn btn-reset" onclick="resetCode()">🔄 초기화</button>
+            </div>
+            
+            <div class="output-section">
+                <div class="output-header">실행 결과</div>
+                <div id="output-content" class="output-content">코드를 실행하면 결과가 여기에 표시됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProblem = null;
+        let problemId = null;
+        
+        // 페이지 로드 시 인증 확인 및 문제 정보 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // URL에서 문제 ID 추출
+            const urlParams = new URLSearchParams(window.location.search);
+            problemId = urlParams.get('id');
+            
+            if (!problemId) {
+                alert('유효하지 않은 문제 ID입니다.');
+                window.location.href = '/problems.html';
+                return;
+            }
+            
+            await loadProblem(problemId);
+        });
+        
+        // 문제 정보 로드
+        async function loadProblem(id) {
+            const loading = document.getElementById('loading');
+            const problemContent = document.getElementById('problem-content');
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`/api/problems/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    currentProblem = result.problem || result.data;
+                    
+                    loading.style.display = 'none';
+                    problemContent.style.display = 'block';
+                    
+                    renderProblem(currentProblem);
+                } else {
+                    console.log('API 응답 실패, 샘플 데이터 사용');
+                    loading.style.display = 'none';
+                    problemContent.style.display = 'block';
+                    loadSampleProblem(id);
+                }
+                
+            } catch (error) {
+                console.error('문제 로드 오류:', error);
+                loading.style.display = 'none';
+                problemContent.style.display = 'block';
+                loadSampleProblem(id);
+            }
+        }
+        
+        // 샘플 문제 데이터 로드
+        function loadSampleProblem(id) {
+            const sampleProblems = {
+                '1': {
+                    id: 1,
+                    title: '두 수의 합',
+                    description: `정수 배열 nums와 정수 target이 주어졌을 때, target과 같은 값이 되는 두 수의 인덱스를 반환하세요.
+
+각 입력에 대해 정확히 하나의 해답이 존재한다고 가정할 수 있으며, 같은 원소를 두 번 사용할 수는 없습니다.
+
+답은 어떤 순서로든 반환할 수 있습니다.`,
+                    difficulty: 'beginner',
+                    category: 'algorithm',
+                    maxScore: 100,
+                    timeLimit: 30,
+                    examples: [
+                        {
+                            input: 'nums = [2,7,11,15], target = 9',
+                            output: '[0,1]',
+                            explanation: 'nums[0] + nums[1] = 2 + 7 = 9이므로 [0, 1]을 반환합니다.'
+                        },
+                        {
+                            input: 'nums = [3,2,4], target = 6',
+                            output: '[1,2]',
+                            explanation: 'nums[1] + nums[2] = 2 + 4 = 6이므로 [1, 2]를 반환합니다.'
+                        }
+                    ]
+                },
+                '2': {
+                    id: 2,
+                    title: '스택 구현하기',
+                    description: `기본적인 스택 자료구조를 구현하세요. 스택은 LIFO(Last In First Out) 방식으로 동작합니다.
+
+다음 연산들을 구현해야 합니다:
+- push(x): 원소 x를 스택의 맨 위에 추가
+- pop(): 스택의 맨 위 원소를 제거하고 반환
+- top(): 스택의 맨 위 원소를 반환 (제거하지 않음)
+- empty(): 스택이 비어있으면 true, 아니면 false 반환`,
+                    difficulty: 'beginner',
+                    category: 'data-structure',
+                    maxScore: 100,
+                    timeLimit: 45,
+                    examples: [
+                        {
+                            input: 'stack.push(1)\nstack.push(2)\nstack.top()',
+                            output: '2',
+                            explanation: '스택에 1, 2를 순서대로 추가한 후 맨 위 원소인 2를 반환합니다.'
+                        }
+                    ]
+                },
+                '3': {
+                    id: 3,
+                    title: '이진 탐색 트리',
+                    description: `이진 탐색 트리(Binary Search Tree)를 구현하세요.
+
+구현해야 할 연산들:
+- insert(val): 값을 트리에 삽입
+- search(val): 값이 트리에 있는지 검색
+- delete(val): 값을 트리에서 삭제
+- inorder(): 중위 순회 결과 반환`,
+                    difficulty: 'intermediate',
+                    category: 'data-structure',
+                    maxScore: 150,
+                    timeLimit: 60,
+                    examples: [
+                        {
+                            input: 'bst.insert(5)\nbst.insert(3)\nbst.insert(7)\nbst.inorder()',
+                            output: '[3, 5, 7]',
+                            explanation: '중위 순회 시 오름차순으로 정렬된 결과를 반환합니다.'
+                        }
+                    ]
+                },
+                '4': {
+                    id: 4,
+                    title: 'REST API 설계',
+                    description: `사용자 관리를 위한 RESTful API를 설계하고 구현하세요.
+
+필요한 엔드포인트들:
+- GET /users: 모든 사용자 조회
+- GET /users/:id: 특정 사용자 조회
+- POST /users: 새 사용자 생성
+- PUT /users/:id: 사용자 정보 수정
+- DELETE /users/:id: 사용자 삭제
+
+각 엔드포인트는 적절한 HTTP 상태 코드와 응답을 반환해야 합니다.`,
+                    difficulty: 'intermediate',
+                    category: 'web-development',
+                    maxScore: 200,
+                    timeLimit: 90,
+                    examples: [
+                        {
+                            input: 'GET /users/1',
+                            output: '{"id": 1, "name": "John", "email": "john@example.com"}',
+                            explanation: 'ID가 1인 사용자의 정보를 JSON 형태로 반환합니다.'
+                        }
+                    ]
+                },
+                '5': {
+                    id: 5,
+                    title: '그래프 최단 경로',
+                    description: `가중치가 있는 방향 그래프에서 시작 노드부터 모든 다른 노드까지의 최단 경로를 찾는 다익스트라 알고리즘을 구현하세요.
+
+입력:
+- graph: 인접 리스트로 표현된 그래프
+- start: 시작 노드
+
+출력:
+- 시작 노드부터 각 노드까지의 최단 거리를 담은 딕셔너리`,
+                    difficulty: 'advanced',
+                    category: 'algorithm',
+                    maxScore: 300,
+                    timeLimit: 120,
+                    examples: [
+                        {
+                            input: 'graph = {0: [(1, 4), (2, 2)], 1: [(2, 1), (3, 5)], 2: [(3, 8)], 3: []}\nstart = 0',
+                            output: '{0: 0, 1: 4, 2: 2, 3: 9}',
+                            explanation: '시작 노드 0부터 각 노드까지의 최단 거리입니다.'
+                        }
+                    ]
+                }
+            };
+            
+            currentProblem = sampleProblems[id] || sampleProblems['1'];
+            renderProblem(currentProblem);
+        }
+        
+        // 문제 렌더링
+        function renderProblem(problem) {
+            // 제목 설정
+            document.getElementById('problem-title').textContent = problem.title;
+            document.title = `${problem.title} - PBT LMS`;
+            
+            // 메타 정보 설정
+            const metaContainer = document.getElementById('problem-meta');
+            const difficultyClass = `difficulty-${problem.difficulty}`;
+            const difficultyText = {
+                'beginner': '초급',
+                'intermediate': '중급',
+                'advanced': '고급'
+            }[problem.difficulty] || '초급';
+            
+            const categoryText = {
+                'algorithm': '알고리즘',
+                'data-structure': '자료구조',
+                'web-development': '웹 개발',
+                'database': '데이터베이스'
+            }[problem.category] || problem.category;
+            
+            metaContainer.innerHTML = `
+                <span class="meta-tag ${difficultyClass}">${difficultyText}</span>
+                <span class="meta-tag category-tag">${categoryText}</span>
+                <span class="meta-tag">최대 점수: ${problem.maxScore}점</span>
+                ${problem.timeLimit ? `<span class="meta-tag">⏱️ ${problem.timeLimit}분</span>` : ''}
+            `;
+            
+            // 문제 설명 설정
+            document.getElementById('problem-description').innerHTML = problem.description.replace(/\n/g, '<br>');
+            
+            // 예제 설정
+            const examplesContainer = document.getElementById('examples-container');
+            if (problem.examples && problem.examples.length > 0) {
+                examplesContainer.innerHTML = problem.examples.map((example, index) => `
+                    <div class="example">
+                        <div class="example-title">예제 ${index + 1}</div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>입력:</strong>
+                            <div class="example-content">${example.input}</div>
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>출력:</strong>
+                            <div class="example-content">${example.output}</div>
+                        </div>
+                        ${example.explanation ? `
+                            <div>
+                                <strong>설명:</strong> ${example.explanation}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } else {
+                examplesContainer.innerHTML = '<p>예제가 준비되어 있지 않습니다.</p>';
+            }
+            
+            // 기본 코드 템플릿 설정
+            setDefaultCode();
+        }
+        
+        // 언어별 기본 코드 템플릿
+        const codeTemplates = {
+            python: `def solution():
+    # 여기에 코드를 작성하세요
+    pass
+
+# 테스트
+if __name__ == "__main__":
+    result = solution()
+    print(result)`,
+            javascript: `function solution() {
+    // 여기에 코드를 작성하세요
+    
+}
+
+// 테스트
+console.log(solution());`,
+            java: `public class Solution {
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        // 여기에 테스트 코드를 작성하세요
+    }
+    
+    public void solution() {
+        // 여기에 코드를 작성하세요
+        
+    }
+}`,
+            cpp: `#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    // 여기에 코드를 작성하세요
+    
+    return 0;
+}`
+        };
+        
+        // 언어 변경
+        function changeLanguage() {
+            setDefaultCode();
+        }
+        
+        // 기본 코드 설정
+        function setDefaultCode() {
+            const language = document.getElementById('language-selector').value;
+            const codeEditor = document.getElementById('code-editor');
+            codeEditor.value = codeTemplates[language] || codeTemplates.python;
+        }
+        
+        // 코드 실행
+        async function runCode() {
+            const language = document.getElementById('language-selector').value;
+            const code = document.getElementById('code-editor').value;
+            const outputContent = document.getElementById('output-content');
+            const token = localStorage.getItem('authToken');
+            
+            outputContent.textContent = '실행 중...';
+            
+            try {
+                const response = await fetch(`/api/problems/${problemId}/run`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        language: language
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    outputContent.textContent = result.output || '실행 완료';
+                } else {
+                    outputContent.textContent = `오류: ${result.message}`;
+                }
+                
+            } catch (error) {
+                console.error('코드 실행 오류:', error);
+                outputContent.textContent = `실행 중 오류가 발생했습니다: ${error.message}`;
+            }
+        }
+        
+        // 코드 제출
+        async function submitCode() {
+            const language = document.getElementById('language-selector').value;
+            const code = document.getElementById('code-editor').value;
+            const token = localStorage.getItem('authToken');
+            
+            if (!code.trim()) {
+                alert('코드를 작성해주세요.');
+                return;
+            }
+            
+            if (!confirm('코드를 제출하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/problems/${problemId}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        language: language
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`제출이 완료되었습니다!\n점수: ${result.score || 0}점`);
+                } else {
+                    alert(`제출 실패: ${result.message}`);
+                }
+                
+            } catch (error) {
+                console.error('코드 제출 오류:', error);
+                alert(`제출 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        // 코드 초기화
+        function resetCode() {
+            if (confirm('코드를 초기화하시겠습니까? 작성한 내용이 모두 사라집니다.')) {
+                setDefaultCode();
+            }
+        }
+        
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

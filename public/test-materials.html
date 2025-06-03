@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 자료 업로드 테스트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .container { max-width: 800px; }
+        .card { margin-bottom: 20px; }
+        #materialsList { margin-top: 30px; }
+        .material-item { 
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .material-actions { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">PBT LMS - 학습 자료 테스트</h1>
+        
+        <!-- 로그인 폼 -->
+        <div class="card" id="loginCard">
+            <div class="card-header">로그인</div>
+            <div class="card-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">비밀번호</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">로그인</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 문제 목록 -->
+        <div class="card d-none" id="problemCard">
+            <div class="card-header">문제 선택</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="problemSelect" class="form-label">문제 선택</label>
+                    <select class="form-select" id="problemSelect">
+                        <option value="">문제를 선택하세요</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 파일 업로드 -->
+        <div class="card d-none" id="uploadCard">
+            <div class="card-header">학습 자료 업로드</div>
+            <div class="card-body">
+                <form id="uploadForm">
+                    <input type="hidden" id="selectedProblemId" name="problemId">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">자료 유형</label>
+                        <select class="form-select" id="type" name="type" required>
+                            <option value="document">문서</option>
+                            <option value="video">비디오</option>
+                            <option value="link">링크</option>
+                            <option value="code">코드</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="fileInputGroup">
+                        <label for="file" class="form-label">파일</label>
+                        <input type="file" class="form-control" id="file" name="file">
+                    </div>
+                    <div class="mb-3 d-none" id="urlInputGroup">
+                        <label for="url" class="form-label">URL</label>
+                        <input type="url" class="form-control" id="url" name="url">
+                    </div>
+                    <button type="submit" class="btn btn-primary">업로드</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 자료 목록 -->
+        <div id="materialsList" class="d-none">
+            <h3>학습 자료 목록</h3>
+            <div id="materialsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let token = localStorage.getItem('token');
+        let currentProblemId = null;
+        
+        // DOM 요소
+        const loginCard = document.getElementById('loginCard');
+        const problemCard = document.getElementById('problemCard');
+        const uploadCard = document.getElementById('uploadCard');
+        const materialsList = document.getElementById('materialsList');
+        
+        // 이벤트 리스너
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+        document.getElementById('problemSelect').addEventListener('change', handleProblemSelect);
+        document.getElementById('type').addEventListener('change', handleTypeChange);
+        
+        // 페이지 로드 시 체크
+        window.addEventListener('DOMContentLoaded', () => {
+            if (token) {
+                loginCard.classList.add('d-none');
+                problemCard.classList.remove('d-none');
+                fetchProblems();
+            }
+        });
+        
+        // 로그인 처리
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    
+                    loginCard.classList.add('d-none');
+                    problemCard.classList.remove('d-none');
+                    
+                    fetchProblems();
+                    
+                    alert('로그인 성공!');
+                } else {
+                    alert('로그인 실패: ' + data.message);
+                }
+            } catch (error) {
+                console.error('로그인 오류:', error);
+                alert('로그인 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 문제 목록 가져오기
+        async function fetchProblems() {
+            try {
+                const response = await fetch('/api/problems', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const problemSelect = document.getElementById('problemSelect');
+                    
+                    // Clear existing options
+                    problemSelect.innerHTML = '<option value="">문제를 선택하세요</option>';
+                    
+                    // Add problems to select
+                    data.data.problems.forEach(problem => {
+                        const option = document.createElement('option');
+                        option.value = problem.id;
+                        option.textContent = problem.title;
+                        problemSelect.appendChild(option);
+                    });
+                } else {
+                    alert('문제 목록 가져오기 실패: ' + data.message);
+                }
+            } catch (error) {
+                console.error('문제 목록 가져오기 오류:', error);
+                alert('문제 목록을 가져오는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 문제 선택 처리
+        function handleProblemSelect(e) {
+            const problemId = e.target.value;
+            
+            if (problemId) {
+                currentProblemId = problemId;
+                document.getElementById('selectedProblemId').value = problemId;
+                
+                uploadCard.classList.remove('d-none');
+                materialsList.classList.remove('d-none');
+                
+                fetchMaterials(problemId);
+            } else {
+                uploadCard.classList.add('d-none');
+                materialsList.classList.add('d-none');
+                currentProblemId = null;
+            }
+        }
+        
+        // 자료 유형 변경 처리
+        function handleTypeChange(e) {
+            const type = e.target.value;
+            const fileInputGroup = document.getElementById('fileInputGroup');
+            const urlInputGroup = document.getElementById('urlInputGroup');
+            
+            if (type === 'link') {
+                fileInputGroup.classList.add('d-none');
+                urlInputGroup.classList.remove('d-none');
+                document.getElementById('url').required = true;
+                document.getElementById('file').required = false;
+            } else {
+                fileInputGroup.classList.remove('d-none');
+                urlInputGroup.classList.add('d-none');
+                document.getElementById('url').required = false;
+                document.getElementById('file').required = type === 'document' || type === 'video';
+            }
+        }
+        
+        // 학습 자료 업로드 처리
+        async function handleUpload(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/api/materials', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('학습 자료가 업로드되었습니다');
+                    form.reset();
+                    fetchMaterials(currentProblemId);
+                } else {
+                    alert('업로드 실패: ' + data.message);
+                }
+            } catch (error) {
+                console.error('업로드 오류:', error);
+                alert('업로드 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 학습 자료 목록 가져오기
+        async function fetchMaterials(problemId) {
+            try {
+                const response = await fetch(`/api/materials/problem/${problemId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const materialsContainer = document.getElementById('materialsContainer');
+                    
+                    // Clear existing materials
+                    materialsContainer.innerHTML = '';
+                    
+                    // Add materials to list
+                    if (data.data.length === 0) {
+                        materialsContainer.innerHTML = '<p>등록된 학습 자료가 없습니다.</p>';
+                    } else {
+                        data.data.forEach(material => {
+                            const materialItem = document.createElement('div');
+                            materialItem.className = 'material-item';
+                            
+                            const materialInfo = document.createElement('div');
+                            materialInfo.className = 'material-info';
+                            
+                            // 자료 타입에 따른 아이콘
+                            let typeIcon = '';
+                            switch(material.type) {
+                                case 'document': typeIcon = '📄'; break;
+                                case 'video': typeIcon = '🎬'; break;
+                                case 'link': typeIcon = '🔗'; break;
+                                case 'code': typeIcon = '💻'; break;
+                            }
+                            
+                            materialInfo.innerHTML = `
+                                <strong>${typeIcon} ${material.title}</strong>
+                                <div class="text-muted small">
+                                    올린이: ${material.uploader?.fullName || '알 수 없음'} | 
+                                    날짜: ${new Date(material.createdAt).toLocaleDateString()}
+                                </div>
+                            `;
+                            
+                            const materialActions = document.createElement('div');
+                            materialActions.className = 'material-actions';
+                            
+                            // 다운로드 버튼 (파일이 있는 경우만)
+                            if (material.filePath) {
+                                const downloadBtn = document.createElement('button');
+                                downloadBtn.className = 'btn btn-sm btn-primary';
+                                downloadBtn.textContent = '다운로드';
+                                downloadBtn.addEventListener('click', () => downloadMaterial(material.id));
+                                materialActions.appendChild(downloadBtn);
+                            }
+                            
+                            // URL 링크 (링크 타입인 경우만)
+                            if (material.type === 'link' && material.url) {
+                                const linkBtn = document.createElement('a');
+                                linkBtn.className = 'btn btn-sm btn-success';
+                                linkBtn.href = material.url;
+                                linkBtn.target = '_blank';
+                                linkBtn.textContent = '링크 열기';
+                                materialActions.appendChild(linkBtn);
+                            }
+                            
+                            // 삭제 버튼
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'btn btn-sm btn-danger';
+                            deleteBtn.textContent = '삭제';
+                            deleteBtn.addEventListener('click', () => deleteMaterial(material.id));
+                            materialActions.appendChild(deleteBtn);
+                            
+                            materialItem.appendChild(materialInfo);
+                            materialItem.appendChild(materialActions);
+                            materialsContainer.appendChild(materialItem);
+                        });
+                    }
+                } else {
+                    alert('학습 자료 목록 가져오기 실패: ' + data.message);
+                }
+            } catch (error) {
+                console.error('학습 자료 목록 가져오기 오류:', error);
+                alert('학습 자료 목록을 가져오는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 학습 자료 다운로드
+        function downloadMaterial(materialId) {
+            window.open(`/api/materials/download/${materialId}`);
+        }
+        
+        // 학습 자료 삭제
+        async function deleteMaterial(materialId) {
+            if (!confirm('정말로 이 학습 자료를 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/materials/${materialId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('학습 자료가 삭제되었습니다');
+                    fetchMaterials(currentProblemId);
+                } else {
+                    alert('삭제 실패: ' + data.message);
+                }
+            } catch (error) {
+                console.error('삭제 오류:', error);
+                alert('삭제 중 오류가 발생했습니다');
+            }
+        }
+    </script>
+</body>
+</html>

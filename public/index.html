@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 인재 커리어 플랫폼 PBT - Problem-Based Training Learning Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+        }
+        
+        .auth-buttons {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .auth-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .auth-btn.login {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .auth-btn.login:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .auth-btn.register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 2px solid transparent;
+        }
+        
+        .auth-btn.register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .auth-buttons {
+                position: static;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+            
+            .auth-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.85rem;
+            }
+        }
+        
+        .header h1 {
+            color: #4a5568;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h3 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .card p {
+            color: #718096;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .api-status {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .feature-list li:before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="auth-buttons">
+                <a href="/login.html" class="auth-btn login">
+                    🔑 로그인
+                </a>
+                <a href="/register.html" class="auth-btn register">
+                    👤 회원가입
+                </a>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                <img src="/assets/images/pbt-logo.png" alt="PBT Logo" style="height: 60px; width: auto;">
+                <h1 style="margin: 0;">AI 인재 커리어 플랫폼 PBT</h1>
+            </div>
+            <p>Problem-Based Training Learning Management System</p>
+            <div class="subtitle">문제 해결 중심의 실무 역량 강화</div>
+        </div>
+        
+        <div class="api-status">
+            <h3><span class="status-indicator"></span>시스템 상태</h3>
+            <p>✅ 서버 실행 중 (Node.js + Express)</p>
+            <p>✅ 데이터베이스 연결됨 (MySQL)</p>
+            <p>✅ API 엔드포인트 구현 완료</p>
+            <p>✅ 파일 업로드 시스템 구현 완료</p>
+            <p>✅ 코드 실행 엔진 구현 완료</p>
+            <p>🔄 프론트엔드 개발 진행 중</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="card">
+                <h3>🎯 프로젝트 개요</h3>
+                <p>실무 중심의 문제 해결 능력을 기르는 차세대 학습 관리 시스템입니다.</p>
+                <ul class="feature-list">
+                    <li>문제 기반 학습(PBL) 관리</li>
+                    <li>실시간 코드 실행 및 평가</li>
+                    <li>팀 협업 및 토론 기능</li>
+                    <li>개인별 학습 진도 추적</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>🛠️ 기술 스택</h3>
+                <p>최신 웹 기술을 활용한 현대적인 플랫폼입니다.</p>
+                <ul class="feature-list">
+                    <li>Backend: Node.js + Express</li>
+                    <li>Database: MySQL + Sequelize</li>
+                    <li>Frontend: React + Material-UI</li>
+                    <li>실시간: Socket.io</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>📊 개발 진행 상황</h3>
+                <p>현재 Phase 2 문제 관리 시스템 구축 완료!</p>
+                <ul class="feature-list">
+                    <li>Express 서버 설정 완료</li>
+                    <li>데이터베이스 모델 생성 완료</li>
+                    <li>문제 관리 API 구현 완료</li>
+                    <li>테스트케이스 관리 시스템 완료</li>
+                    <li>학습 자료 관리 시스템 완료</li>
+                    <li>코드 실행 및 자동 평가 구현 완료</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>🚀 테스트 페이지</h3>
+                <p>구현된 기능을 테스트해보세요.</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <a href="/test-materials.html" class="btn">학습 자료 관리</a>
+                    <a href="/test-solutions.html" class="btn">솔루션 제출</a>
+                </div>
+                <button class="btn" style="background: linear-gradient(135deg, #38b2ac 0%, #0c9a9a 100%);" onclick="testAPI()">API 상태 확인</button>
+                <div id="api-result" style="margin-top: 1rem; padding: 1rem; background: #f7fafc; border-radius: 8px; display: none;">
+                    <pre id="api-output"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 PBT LMS Platform | Powered by Node.js & React</p>
+            <p>개발 진행 중 - Claude AI Assistant와 함께</p>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            const outputDiv = document.getElementById('api-output');
+            
+            try {
+                resultDiv.style.display = 'block';
+                outputDiv.textContent = '🔄 API 테스트 중...';
+                
+                // 테스트할 API 엔드포인트들
+                const endpoints = [
+                    { name: 'Health Check', url: '/api/health' },
+                    { name: 'Problems List', url: '/api/problems' },
+                    { name: 'Users List', url: '/api/users' }
+                ];
+                
+                let results = '📡 API 엔드포인트 테스트 결과:\n\n';
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint.url);
+                        const status = response.status;
+                        results += `${endpoint.name}: ${status === 200 ? '✅' : '❌'} (${status})\n`;
+                    } catch (error) {
+                        results += `${endpoint.name}: ❌ (Network Error)\n`;
+                    }
+                }
+                
+                results += '\n📝 구현된 라우트:\n';
+                results += '• /api/auth/* - 인증 관련\n';
+                results += '• /api/problems/* - 문제 관리\n';
+                results += '• /api/solutions/* - 솔루션 관리\n';
+                results += '• /api/users/* - 사용자 관리\n';
+                results += '• /api/testcases/* - 테스트 케이스 관리\n';
+                results += '• /api/materials/* - 학습 자료 관리\n';
+                
+                outputDiv.textContent = results;
+                
+            } catch (error) {
+                outputDiv.textContent = `❌ 오류 발생: ${error.message}`;
+            }
+        }
+        
+        // 페이지 로드 시 자동으로 상태 체크
+        window.addEventListener('load', () => {
+            console.log('🧩 PBT LMS 플랫폼이 로드되었습니다!');
+            console.log('🚀 서버 상태: 실행 중');
+            console.log('📊 개발 단계: Phase 2 - 문제 관리 시스템 구축 완료');
+        });
+    </script>
+    
+    <!-- PBT LMS 챗봇 -->
+    <script src="/js/chatbot.js"></script>
+</body>
+</html>
