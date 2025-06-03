@@ -1,8 +1,8 @@
 {
-  "name": "hs",
+  "name": "pbt-demo",
   "version": "1.0.0",
-  "description": "> \"프로젝트로 완성하는 실무 역량\"",
-  "main": "index.js",
+  "description": "PBT Demo - Problem-Based Training Demo Platform",
+  "main": "server.js",
   "directories": {
     "doc": "docs"
   },
