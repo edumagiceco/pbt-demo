@@ -1,6 +1,23 @@
-# PBT Demo - Problem-Based Training Demo Platform 개발 계획서
+# PBT Demo - Project-Based Training Demo Platform 개발 계획서
 
 ## 📋 최신 완료된 작업 (2025.06.04)
+
+  - **🆕 ✅ PBT 시스템 명칭 정정 완료** (2025.06.04) **NEW** ✅
+  - **작업 내용**: Problem-Based Training에서 Project-Based Training으로 시스템 명칭 수정
+  - **수정 범위**:
+    - README.md: 플랫폼 소개 및 기능 설명 전체 수정
+    - docs/project_plan.md: 프로젝트 계획서 핵심 목표 및 슬로건 수정
+    - public/index.html: 메인 페이지 제목 및 설명 수정
+    - public/dashboard.html: 대시보드 환영 메시지 및 통계 레이블 수정
+    - public/js/chatbot.js: 챗봇 빠른 액션 및 페이지 컨텍스트 수정
+    - src/routes/chatbot.js: AI 챗봇 지식 베이스 시스템 역할 및 FAQ 수정
+  - **핵심 변경사항**:
+    - "문제 해결 중심" → "프로젝트 중심" 학습 방향 전환
+    - "문제 풀이" → "프로젝트 수행" 기능 명칭 변경
+    - "해결한 문제" → "완료한 프로젝트" 통계 표시 변경
+    - AI 챗봇 도우미의 PBT 시스템 설명 업데이트
+  - **효과**: 실제 업무 환경에서 수행하는 프로젝트 중심 학습으로 교육 방향 명확화
+  - **일관성**: 모든 사용자 인터페이스와 문서에서 Project-Based Training 용어 통일
 
   - **🆕 ✅ 포괄적인 테스트 시스템 구축 완료** (2025.06.04) **NEW** ✅
   - **작업 내용**: PBT Demo 플랫폼의 품질 보증을 위한 체계적인 테스트 시스템 구축
@@ -1145,11 +1162,11 @@ POST   /api/content/analyze/website   // 웹사이트 분석
 ## 1. 프로젝트 개요
 
 ### 1.1 플랫폼명: PBT Demo
-**슬로건**: "문제 해결 중심의 실무 역량 강화 데모"
+**슬로건**: "프로젝트 중심의 실무 역량 강화 데모"
 
 ### 1.2 핵심 목표
 - Node.js/Express 기반의 현대적이고 확장 가능한 LMS 시스템 구축
-- 문제 기반 학습(Problem-Based Training) 관리 및 평가 시스템
+- 프로젝트 기반 학습(Project-Based Training) 관리 및 평가 시스템
 - 실시간 진도 추적 및 피드백 기능
 - React 기반 SPA로 우수한 사용자 경험 제공
 - RESTful API 구조로 미래 확장성 고려

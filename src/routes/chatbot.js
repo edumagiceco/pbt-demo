@@ -10,12 +10,12 @@ const anthropic = new Anthropic({
 // PBT LMS 관련 지식 베이스
 const LMS_KNOWLEDGE_BASE = {
     system: {
-        role: "당신은 PBT(Problem-Based Training) LMS 시스템의 운영 도우미입니다. 학습자, 강사, 관리자에게 도움을 제공합니다.",
+        role: "당신은 PBT(Project-Based Training) LMS 시스템의 운영 도우미입니다. 학습자, 강사, 관리자에게 도움을 제공합니다.",
         context: `
-PBT LMS는 문제 해결 중심의 학습 관리 시스템입니다.
+PBT LMS는 프로젝트 중심의 학습 관리 시스템입니다.
 
 주요 기능:
-1. 문제 풀이 시스템 - 코딩 문제를 풀고 자동 채점을 받을 수 있습니다
+1. 프로젝트 수행 시스템 - 실무 프로젝트를 수행하고 자동 평가를 받을 수 있습니다
 2. 과정 관리 - 다양한 프로그래밍 과정을 수강할 수 있습니다
 3. 과제 제출 - 과제를 온라인으로 제출하고 피드백을 받을 수 있습니다
 4. 토론 게시판 - 학습자들과 소통하고 질문할 수 있습니다
@@ -23,15 +23,15 @@ PBT LMS는 문제 해결 중심의 학습 관리 시스템입니다.
 6. 만다라트 시스템 - 목표 설정 및 관리 기능이 있습니다
 
 사용자 유형:
-- 학습자: 과정 수강, 문제 풀이, 과제 제출
-- 강사: 과정 관리, 문제 출제, 학습자 관리
+- 학습자: 과정 수강, 프로젝트 수행, 과제 제출
+- 강사: 과정 관리, 프로젝트 출제, 학습자 관리
 - 관리자: 시스템 전체 관리, 사용자 관리, 통계 확인
 
 주요 URL:
 - 로그인: /login.html
 - 대시보드: /dashboard.html
 - 과정 목록: /courses.html
-- 문제 풀이: /problems.html
+- 프로젝트 수행: /problems.html
 - 토론 게시판: /discussions.html
 - 프로필 설정: /profile.html
 `
@@ -46,8 +46,8 @@ PBT LMS는 문제 해결 중심의 학습 관리 시스템입니다.
             answer: "대시보드에서 '과정 둘러보기' 카드를 클릭하거나 /browse-courses.html 페이지에서 원하는 과정을 찾아 수강신청 버튼을 클릭해주세요."
         },
         {
-            question: "문제는 어떻게 풀 수 있나요?",
-            answer: "문제 목록 페이지(/problems.html)에서 문제를 선택하고, 내장된 코드 에디터에서 코드를 작성한 후 실행 및 제출할 수 있습니다. Python, JavaScript, Java, C++ 등을 지원합니다."
+            question: "프로젝트는 어떻게 수행할 수 있나요?",
+            answer: "프로젝트 목록 페이지(/problems.html)에서 프로젝트를 선택하고, 내장된 코드 에디터에서 코드를 작성한 후 실행 및 제출할 수 있습니다. Python, JavaScript, Java, C++ 등을 지원합니다."
         },
         {
             question: "과제 제출은 어떻게 하나요?",

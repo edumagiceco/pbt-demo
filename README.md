@@ -1,8 +1,8 @@
-# 🧩 PBT Demo - Problem-Based Training Demo Platform
+# 🧩 PBT Demo - Project-Based Training Demo Platform
 
-> "문제 해결 중심의 실무 역량 강화 데모"
+> "프로젝트 중심의 실무 역량 강화 데모"
 
-PBT Demo는 문제 기반 학습을 위한 현대적인 학습 관리 시스템의 데모 버전입니다.
+PBT Demo는 프로젝트 기반 학습을 위한 현대적인 학습 관리 시스템의 데모 버전입니다.
 
 ![Node.js](https://img.shields.io/badge/Node.js-20.x+-339933?style=flat-square&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-5.x-000000?style=flat-square&logo=express&logoColor=white)
@@ -38,8 +38,8 @@ cd /Users/magic/data/claude/pbt-demo
 - **JWT 기반 인증**: 안전한 토큰 기반 인증 시스템
 - **역할 기반 접근 제어**: 권한별 API 및 페이지 제한
 
-### 🧩 문제 관리
-- **문제 CRUD**: 생성, 조회, 수정, 삭제 기능
+### 🧩 프로젝트 관리
+- **프로젝트 CRUD**: 생성, 조회, 수정, 삭제 기능
 - **난이도별 분류**: Beginner, Intermediate, Advanced
 - **테스트케이스 관리**: 자동 채점을 위한 입출력 테스트케이스
 - **실시간 코드 실행**: Monaco Editor 기반 코드 편집 및 실행
@@ -51,8 +51,8 @@ cd /Users/magic/data/claude/pbt-demo
 - **솔루션 이력 관리**: 제출 기록 및 피드백
 
 ### 📊 대시보드
-- **학생 대시보드**: 해결한 문제, 진행률, 최근 활동
-- **강사 대시보드**: 문제 관리, 학생 평가, 통계
+- **학생 대시보드**: 진행 중인 프로젝트, 진행률, 최근 활동
+- **강사 대시보드**: 프로젝트 관리, 학생 평가, 통계
 - **관리자 대시보드**: 시스템 전체 관리 및 모니터링
 
 ### 🎨 현대적 UI/UX
@@ -298,7 +298,7 @@ npm run lint
 - 다양한 프로그래밍 언어 지원
 
 ### 🎯 **교육 최적화**
-- 문제 기반 학습(PBL) 방법론
+- 프로젝트 기반 학습(PBT) 방법론
 - 단계별 난이도 조절
 - 개인별 학습 진도 추적
 - 실시간 피드백
@@ -343,7 +343,7 @@ PBT LMS는 다음 오픈소스 프로젝트들의 도움으로 만들어졌습�
 
 ---
 
-**🧩 PBT Demo** - "문제 해결 중심의 실무 역량 강화 데모" 🚀
+**🧩 PBT Demo** - "프로젝트 중심의 실무 역량 강화 데모" 🚀
 
 *Made with ❤️ by Claude AI Assistant*
 

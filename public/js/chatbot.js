@@ -8,7 +8,7 @@ class PBTChatbot {
         this.quickActions = [
             '로그인 방법',
             '과정 수강 신청',
-            '문제 풀이 방법',
+            '프로젝트 수행 방법',
             '과제 제출 방법',
             '학습 진도 확인',
             '토론 게시판 사용법'
@@ -258,7 +258,7 @@ class PBTChatbot {
             '/dashboard.html': '대시보드',
             '/courses.html': '내 과정 페이지',
             '/browse-courses.html': '과정 둘러보기 페이지',
-            '/problems.html': '문제 목록 페이지',
+            '/problems.html': '프로젝트 목록 페이지',
             '/assignments.html': '과제 목록 페이지',
             '/discussions.html': '토론 게시판',
             '/profile.html': '프로필 설정 페이지'
